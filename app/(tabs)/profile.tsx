@@ -2,16 +2,15 @@ import { useEffect, useState } from "react";
 import {
   View,
   Text,
-  TextInput,
   FlatList,
   StyleSheet,
-  ActivityIndicator,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import { db } from "@/services/firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/services/firebase";
+import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { db, auth } from "@/services/firebase";
 import { router } from "expo-router";
 
 type Post = {
@@ -20,24 +19,21 @@ type Post = {
   title: string;
   description: string;
   location: string;
-  userName: string;
+  status: string;
   createdAt: string;
 };
 
-export default function HomeScreen() {
+export default function ProfileScreen() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const user = auth.currentUser;
 
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (!user) router.replace("/(auth)/login");
-    });
-    return unsubscribeAuth;
-  }, []);
-
-  useEffect(() => {
-    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+    const q = query(
+      collection(db, "posts"),
+      where("userId", "==", user?.uid),
+      orderBy("createdAt", "desc")
+    );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Post));
       setPosts(data);
@@ -46,28 +42,41 @@ export default function HomeScreen() {
     return unsubscribe;
   }, []);
 
-  const filtered = posts.filter(
-    (p) =>
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      p.description.toLowerCase().includes(search.toLowerCase())
-  );
+  const handleLogout = async () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          await signOut(auth);
+          router.replace("/(auth)/login");
+        },
+      },
+    ]);
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>AIFoundIt</Text>
-      <TextInput
-        style={styles.search}
-        placeholder="Search lost or found items..."
-        value={search}
-        onChangeText={setSearch}
-      />
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.name}>{user?.displayName || "User"}</Text>
+          <Text style={styles.email}>{user?.email}</Text>
+        </View>
+        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.sectionTitle}>My Posts</Text>
+
       {loading ? (
         <ActivityIndicator color="#0a7ea4" style={{ marginTop: 20 }} />
-      ) : filtered.length === 0 ? (
-        <Text style={styles.empty}>No posts yet.</Text>
+      ) : posts.length === 0 ? (
+        <Text style={styles.empty}>You haven't posted anything yet.</Text>
       ) : (
         <FlatList
-          data={filtered}
+          data={posts}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.card}>
@@ -76,7 +85,7 @@ export default function HomeScreen() {
               </View>
               <Text style={styles.cardTitle}>{item.title}</Text>
               <Text style={styles.cardDesc}>{item.description}</Text>
-              <Text style={styles.cardMeta}>📍 {item.location} • {item.userName}</Text>
+              <Text style={styles.cardMeta}>📍 {item.location} • {item.status}</Text>
             </View>
           )}
         />
@@ -87,8 +96,12 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f5f5f5", padding: 16, paddingTop: 52 },
-  title: { fontSize: 24, fontWeight: "bold", color: "#0a7ea4", marginBottom: 12 },
-  search: { backgroundColor: "#fff", borderRadius: 10, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: "#ddd" },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 24 },
+  name: { fontSize: 20, fontWeight: "bold", color: "#11181C" },
+  email: { fontSize: 13, color: "#687076" },
+  logoutBtn: { backgroundColor: "#ff6b6b", paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
+  logoutText: { color: "#fff", fontWeight: "bold" },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", color: "#0a7ea4", marginBottom: 12 },
   empty: { textAlign: "center", color: "#687076", marginTop: 40 },
   card: { backgroundColor: "#fff", borderRadius: 12, padding: 16, marginBottom: 12, elevation: 2 },
   badge: { alignSelf: "flex-start", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2, marginBottom: 8 },
