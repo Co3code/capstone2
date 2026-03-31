@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from "react-native";
 import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
 import { db, auth } from "@/services/firebase";
+import { router } from "expo-router";
 
 type Notification = {
   id: string;
   message: string;
   createdAt: string;
   read: boolean;
+  matchedPostId?: string;
+  score?: number;
 };
 
 export default function NotificationsScreen() {
@@ -40,10 +43,14 @@ export default function NotificationsScreen() {
           data={notifications}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={[styles.card, !item.read && styles.unread]}>
+            <TouchableOpacity
+              style={[styles.card, !item.read && styles.unread]}
+              onPress={() => item.matchedPostId && router.push({ pathname: "/(tabs)/match-details", params: { postId: item.matchedPostId, score: item.score } })}
+            >
               <Text style={styles.message}>{item.message}</Text>
               <Text style={styles.time}>{new Date(item.createdAt).toLocaleDateString()}</Text>
-            </View>
+              {item.matchedPostId && <Text style={styles.tap}>Tap to view match →</Text>}
+            </TouchableOpacity>
           )}
         />
       )}
@@ -59,4 +66,5 @@ const styles = StyleSheet.create({
   unread: { borderLeftWidth: 4, borderLeftColor: "#0a7ea4" },
   message: { fontSize: 14, color: "#11181C", marginBottom: 4 },
   time: { fontSize: 12, color: "#aaa" },
+  tap: { fontSize: 12, color: "#0a7ea4", marginTop: 4 },
 });

@@ -11,9 +11,10 @@ import {
   Image,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import { db, auth } from "@/services/firebase";
 import { uploadImage } from "@/services/cloudinary";
+import { matchItems } from "@/services/api";
 
 export default function PostScreen() {
   const [type, setType] = useState<"lost" | "found">("lost");
@@ -44,7 +45,7 @@ export default function PostScreen() {
           return Alert.alert("Upload Failed", "Image upload failed. Please check your internet connection.");
         }
       }
-      await addDoc(collection(db, "posts"), {
+      const docRef = await addDoc(collection(db, "posts"), {
         type,
         title,
         description,
@@ -55,6 +56,36 @@ export default function PostScreen() {
         createdAt: new Date().toISOString(),
         status: "unmatched",
       });
+
+      // Fetch existing opposite type posts for matching
+      const oppositeType = type === "lost" ? "found" : "lost";
+      const q = query(
+        collection(db, "posts"),
+        where("type", "==", oppositeType),
+        where("status", "==", "unmatched")
+      );
+      const snapshot = await getDocs(q);
+      const existingPosts = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+      if (existingPosts.length > 0) {
+        try {
+          const matches = await matchItems(docRef.id, title, description, imageUrl, existingPosts);
+          const topMatch = matches.find((m: any) => m.is_match);
+          if (topMatch) {
+            await addDoc(collection(db, "notifications"), {
+              userId: auth.currentUser?.uid,
+              message: `We found a possible match for your ${type} item "${title}"!`,
+              matchedPostId: topMatch.post_id,
+              score: topMatch.score,
+              createdAt: new Date().toISOString(),
+              read: false,
+            });
+          }
+        } catch (matchError: any) {
+          console.log("Matching error:", matchError.message);
+        }
+      }
+
       Alert.alert("Success", "Post submitted! We'll notify you if a match is found.");
       setTitle("");
       setDescription("");

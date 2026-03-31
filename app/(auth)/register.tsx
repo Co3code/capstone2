@@ -16,12 +16,13 @@ import { router } from "expo-router";
 export default function RegisterScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!name || !email || !password || !confirm) return Alert.alert("Error", "Please fill in all fields");
+    if (!name || !email || !phone || !password || !confirm) return Alert.alert("Error", "Please fill in all fields");
     if (password !== confirm) return Alert.alert("Error", "Passwords do not match");
     setLoading(true);
     try {
@@ -31,6 +32,7 @@ export default function RegisterScreen() {
         uid: user.uid,
         name,
         email,
+        phone,
         createdAt: new Date().toISOString(),
       });
       Alert.alert("Success", "Account created! Please login.", [
@@ -56,6 +58,13 @@ export default function RegisterScreen() {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Phone Number"
+        value={phone}
+        onChangeText={setPhone}
+        keyboardType="phone-pad"
       />
       <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
       <TextInput style={styles.input} placeholder="Confirm Password" value={confirm} onChangeText={setConfirm} secureTextEntry />

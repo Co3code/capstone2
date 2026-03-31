@@ -39,6 +39,10 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="match-details"
+        options={{ href: null, headerShown: false }}
+      />
     </Tabs>
   );
 }
