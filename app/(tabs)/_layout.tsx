@@ -43,6 +43,10 @@ export default function TabsLayout() {
         name="match-details"
         options={{ href: null, headerShown: false }}
       />
+      <Tabs.Screen
+        name="post-details"
+        options={{ href: null, headerShown: false }}
+      />
     </Tabs>
   );
 }

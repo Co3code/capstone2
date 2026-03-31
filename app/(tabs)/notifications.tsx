@@ -10,6 +10,7 @@ type Notification = {
   createdAt: string;
   read: boolean;
   matchedPostId?: string;
+  myPostId?: string;
   score?: number;
 };
 
@@ -45,7 +46,7 @@ export default function NotificationsScreen() {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[styles.card, !item.read && styles.unread]}
-              onPress={() => item.matchedPostId && router.push({ pathname: "/(tabs)/match-details", params: { postId: item.matchedPostId, score: item.score } })}
+              onPress={() => item.matchedPostId && router.push({ pathname: "/(tabs)/match-details", params: { postId: item.matchedPostId, myPostId: item.myPostId, score: item.score } })}
             >
               <Text style={styles.message}>{item.message}</Text>
               <Text style={styles.time}>{new Date(item.createdAt).toLocaleDateString()}</Text>

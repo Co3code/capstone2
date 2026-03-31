@@ -11,7 +11,7 @@ import {
   Image,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "@/services/firebase";
 import { uploadImage } from "@/services/cloudinary";
 import { matchItems } from "@/services/api";
@@ -36,6 +36,16 @@ export default function PostScreen() {
     if (!title || !description || !location) return Alert.alert("Error", "Please fill in all fields");
     setLoading(true);
     try {
+      // Check for duplicate post
+      const dupQuery = query(
+        collection(db, "posts"),
+        where("userId", "==", auth.currentUser?.uid),
+        where("title", "==", title),
+        where("type", "==", type),
+        where("status", "==", "unmatched")
+      );
+      const dupSnapshot = await getDocs(dupQuery);
+      if (!dupSnapshot.empty) return Alert.alert("Duplicate Post", "You already have an active post with the same title!");
       let imageUrl = null;
       if (image) {
         try {
@@ -65,21 +75,39 @@ export default function PostScreen() {
         where("status", "==", "unmatched")
       );
       const snapshot = await getDocs(q);
-      const existingPosts = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const existingPosts = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as { id: string; userId: string; title: string; type: string; imageUrl?: string; description: string; status: string }));
 
       if (existingPosts.length > 0) {
         try {
           const matches = await matchItems(docRef.id, title, description, imageUrl, existingPosts);
           const topMatch = matches.find((m: any) => m.is_match);
           if (topMatch) {
+            // Notify current user
             await addDoc(collection(db, "notifications"), {
               userId: auth.currentUser?.uid,
               message: `We found a possible match for your ${type} item "${title}"!`,
               matchedPostId: topMatch.post_id,
+              myPostId: docRef.id,
               score: topMatch.score,
               createdAt: new Date().toISOString(),
               read: false,
             });
+            // Notify the other user
+            const matchedPost = existingPosts.find((p: any) => p.id === topMatch.post_id);
+            if (matchedPost) {
+              await addDoc(collection(db, "notifications"), {
+                userId: matchedPost.userId,
+                message: `We found a possible match for your ${oppositeType} item "${matchedPost.title}"!`,
+                matchedPostId: docRef.id,
+                myPostId: topMatch.post_id,
+                score: topMatch.score,
+                createdAt: new Date().toISOString(),
+                read: false,
+              });
+            }
+            // Mark both posts as matched
+            await updateDoc(doc(db, "posts", docRef.id), { status: "matched" });
+            await updateDoc(doc(db, "posts", topMatch.post_id), { status: "matched" });
           }
         } catch (matchError: any) {
           console.log("Matching error:", matchError.message);
