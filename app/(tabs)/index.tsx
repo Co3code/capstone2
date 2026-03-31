@@ -6,12 +6,11 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
-  TouchableOpacity,
 } from "react-native";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import { db } from "@/services/firebase";
+import { db, auth} from "@/services/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/services/firebase";
+
 import { router } from "expo-router";
 
 type Post = {
