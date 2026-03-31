@@ -44,15 +44,24 @@ export default function PostDetailsScreen() {
           </Text>
         </View>
         <Text style={styles.title}>{post?.title}</Text>
-        <Text style={styles.description}>{post?.description}</Text>
         <View style={styles.divider} />
-        <Text style={styles.meta}>Location: {post?.location}</Text>
-        <Text style={styles.meta}>Posted by: {post?.userName}</Text>
-        <Text style={styles.meta}>Date: {new Date(post?.createdAt).toLocaleDateString()}</Text>
-        <View style={[styles.statusBadge, post?.status === "matched" ? styles.statusMatched : styles.statusUnmatched]}>
-          <Text style={[styles.statusText, post?.status === "matched" ? styles.statusTextMatched : styles.statusTextUnmatched]}>
-            {post?.status === "matched" ? "Matched" : "Unmatched"}
-          </Text>
+        <View style={styles.row}><Text style={styles.label}>Type</Text><Text style={styles.value}>{post?.type?.toUpperCase()}</Text></View>
+        <View style={styles.divider} />
+        <View style={styles.row}><Text style={styles.label}>Description</Text><Text style={styles.value}>{post?.description}</Text></View>
+        <View style={styles.divider} />
+        <View style={styles.row}><Text style={styles.label}>Location</Text><Text style={styles.value}>{post?.location}</Text></View>
+        <View style={styles.divider} />
+        <View style={styles.row}><Text style={styles.label}>Posted by</Text><Text style={styles.value}>{post?.userName}</Text></View>
+        <View style={styles.divider} />
+        <View style={styles.row}><Text style={styles.label}>Date</Text><Text style={styles.value}>{new Date(post?.createdAt).toLocaleDateString()}</Text></View>
+        <View style={styles.divider} />
+        <View style={styles.row}>
+          <Text style={styles.label}>Status</Text>
+          <View style={[styles.statusBadge, post?.status === "matched" ? styles.statusMatched : styles.statusUnmatched]}>
+            <Text style={[styles.statusText, post?.status === "matched" ? styles.statusTextMatched : styles.statusTextUnmatched]}>
+              {post?.status === "matched" ? "Matched" : "Unmatched"}
+            </Text>
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -67,6 +76,9 @@ const styles = StyleSheet.create({
   noImage: { width: "100%", height: 200, borderRadius: 16, backgroundColor: "#e0e0e0", justifyContent: "center", alignItems: "center", marginBottom: 16 },
   noImageText: { color: "#687076", fontSize: 14 },
   card: { backgroundColor: "#fff", borderRadius: 16, padding: 16, elevation: 2 },
+  row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 8 },
+  label: { fontSize: 13, color: "#687076", fontWeight: "600", flex: 1 },
+  value: { fontSize: 13, color: "#11181C", flex: 2, textAlign: "right" },
   badge: { alignSelf: "flex-start", borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, marginBottom: 12 },
   badgeLost: { backgroundColor: "#fff0f0", borderWidth: 1, borderColor: "#ff6b6b" },
   badgeFound: { backgroundColor: "#f0fff4", borderWidth: 1, borderColor: "#51cf66" },

@@ -81,22 +81,32 @@ export default function MatchDetailsScreen() {
       {/* Matched item details */}
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Matched Item Details</Text>
-        <Text style={styles.itemTitle}>{matchedPost?.title}</Text>
-        <Text style={styles.description}>{matchedPost?.description}</Text>
-        <Text style={styles.location}> {matchedPost?.location}</Text>
+        <View style={styles.row}><Text style={styles.label}>Type</Text><Text style={styles.value}>{matchedPost?.type?.toUpperCase()}</Text></View>
+        <View style={styles.divider} />
+        <View style={styles.row}><Text style={styles.label}>Title</Text><Text style={styles.value}>{matchedPost?.title}</Text></View>
+        <View style={styles.divider} />
+        <View style={styles.row}><Text style={styles.label}>Description</Text><Text style={styles.value}>{matchedPost?.description}</Text></View>
+        <View style={styles.divider} />
+        <View style={styles.row}><Text style={styles.label}>Location</Text><Text style={styles.value}>{matchedPost?.location}</Text></View>
       </View>
 
       {/* Contact info */}
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Contact the Owner</Text>
-        <Text style={styles.contactName}>👤 {matchedUser?.name}</Text>
-        <TouchableOpacity onPress={() => Linking.openURL(`mailto:${matchedUser?.email}`)}>
-          <Text style={styles.contactLink}>✉️ {matchedUser?.email}</Text>
+        <View style={styles.row}><Text style={styles.label}>Name</Text><Text style={styles.value}>{matchedUser?.name}</Text></View>
+        <View style={styles.divider} />
+        <TouchableOpacity style={styles.row} onPress={() => Linking.openURL(`mailto:${matchedUser?.email}`)}>  
+          <Text style={styles.label}>Email</Text>
+          <Text style={[styles.value, styles.link]}>{matchedUser?.email}</Text>
         </TouchableOpacity>
         {matchedUser?.phone && (
-          <TouchableOpacity onPress={() => Linking.openURL(`tel:${matchedUser?.phone}`)}>
-            <Text style={styles.contactLink}>📞 {matchedUser?.phone}</Text>
-          </TouchableOpacity>
+          <>
+            <View style={styles.divider} />
+            <TouchableOpacity style={styles.row} onPress={() => Linking.openURL(`tel:${matchedUser?.phone}`)}>
+              <Text style={styles.label}>Phone</Text>
+              <Text style={[styles.value, styles.link]}>{matchedUser?.phone}</Text>
+            </TouchableOpacity>
+          </>
         )}
       </View>
     </ScrollView>
@@ -120,10 +130,10 @@ const styles = StyleSheet.create({
   badge: { alignSelf: "center", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 },
   badgeText: { color: "#fff", fontSize: 11, fontWeight: "bold" },
   card: { backgroundColor: "#fff", borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2 },
-  sectionTitle: { fontSize: 16, fontWeight: "bold", color: "#0a7ea4", marginBottom: 8 },
-  itemTitle: { fontSize: 18, fontWeight: "bold", color: "#11181C", marginBottom: 4 },
-  description: { fontSize: 14, color: "#687076", marginBottom: 8 },
-  location: { fontSize: 13, color: "#aaa" },
-  contactName: { fontSize: 16, fontWeight: "bold", color: "#11181C", marginBottom: 8 },
-  contactLink: { fontSize: 14, color: "#0a7ea4", marginBottom: 8 },
+  sectionTitle: { fontSize: 16, fontWeight: "bold", color: "#0a7ea4", marginBottom: 12 },
+  row: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 8 },
+  label: { fontSize: 13, color: "#687076", fontWeight: "600", flex: 1 },
+  value: { fontSize: 13, color: "#11181C", flex: 2, textAlign: "right" },
+  link: { color: "#0a7ea4" },
+  divider: { height: 1, backgroundColor: "#f0f0f0" },
 });

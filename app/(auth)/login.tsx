@@ -32,8 +32,13 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>AIFoundIt</Text>
-      <Text style={styles.subtitle}>Lost & Found AI Matching</Text>
+      <View style={styles.logoContainer}>
+        <View style={styles.logo}>
+          <Text style={styles.logoText}>AI</Text>
+        </View>
+        <Text style={styles.title}>AIFoundIT</Text>
+        <Text style={styles.subtitle}>Lost & Found AI Matching</Text>
+      </View>
 
       <TextInput
         style={styles.input}
@@ -60,7 +65,7 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
-        <Text style={styles.link}>Don't have an account? <Text style={styles.linkBold}>Register</Text></Text>
+        <Text style={styles.link}>{"Don't have an account?"} <Text style={styles.linkBold}>Register</Text></Text>
       </TouchableOpacity>
     </View>
   );
@@ -68,8 +73,11 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", padding: 24, backgroundColor: "#fff" },
+  logoContainer: { alignItems: "center", marginBottom: 32 },
+  logo: { width: 72, height: 72, borderRadius: 20, backgroundColor: "#0a7ea4", justifyContent: "center", alignItems: "center", marginBottom: 12, elevation: 4 },
+  logoText: { color: "#fff", fontSize: 24, fontWeight: "bold" },
   title: { fontSize: 32, fontWeight: "bold", color: "#0a7ea4", textAlign: "center" },
-  subtitle: { fontSize: 14, color: "#687076", textAlign: "center", marginBottom: 32 },
+  subtitle: { fontSize: 14, color: "#687076", textAlign: "center", marginTop: 4 },
   input: { borderWidth: 1, borderColor: "#ddd", borderRadius: 10, padding: 14, marginBottom: 12, fontSize: 16 },
   forgot: { color: "#0a7ea4", textAlign: "right", marginBottom: 16 },
   button: { backgroundColor: "#0a7ea4", padding: 16, borderRadius: 10, alignItems: "center", marginBottom: 16 },
