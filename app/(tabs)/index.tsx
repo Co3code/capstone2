@@ -78,7 +78,10 @@ export default function HomeScreen() {
       {loading ? (
         <ActivityIndicator color="#0a7ea4" style={{ marginTop: 20 }} />
       ) : filtered.length === 0 ? (
-        <Text style={styles.empty}>No posts yet.</Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyTitle}>No posts yet</Text>
+          <Text style={styles.emptyDesc}>Be the first to post a lost or found item!</Text>
+        </View>
       ) : (
         <FlatList
           data={filtered}
@@ -101,8 +104,8 @@ export default function HomeScreen() {
                   </View>
                   <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
                   <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
-                  <Text style={styles.cardMeta}>{item.location} • {item.userName}</Text>
-                  <Text style={styles.cardDate}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+                  <Text style={styles.cardMeta}>{item.category || "Others"} • {item.location}</Text>
+                  <Text style={styles.cardDate}>{item.userName} • {new Date(item.createdAt).toLocaleDateString()}</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -123,6 +126,9 @@ const styles = StyleSheet.create({
   filterText: { fontSize: 13, fontWeight: "bold", color: "#687076" },
   filterTextActive: { color: "#fff" },
   empty: { textAlign: "center", color: "#687076", marginTop: 40 },
+  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", marginTop: 60 },
+  emptyTitle: { fontSize: 18, fontWeight: "bold", color: "#11181C", marginBottom: 8 },
+  emptyDesc: { fontSize: 14, color: "#687076", textAlign: "center" },
   card: { backgroundColor: "#fff", borderRadius: 16, padding: 12, marginBottom: 12, elevation: 3, shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 6 },
   cardContent: { flexDirection: "row", gap: 12 },
   thumbnail: { width: 90, height: 90, borderRadius: 12 },

@@ -83,6 +83,8 @@ export default function MatchDetailsScreen() {
         <Text style={styles.sectionTitle}>Matched Item Details</Text>
         <View style={styles.row}><Text style={styles.label}>Type</Text><Text style={styles.value}>{matchedPost?.type?.toUpperCase()}</Text></View>
         <View style={styles.divider} />
+        <View style={styles.row}><Text style={styles.label}>Category</Text><Text style={styles.value}>{matchedPost?.category || "Others"}</Text></View>
+        <View style={styles.divider} />
         <View style={styles.row}><Text style={styles.label}>Title</Text><Text style={styles.value}>{matchedPost?.title}</Text></View>
         <View style={styles.divider} />
         <View style={styles.row}><Text style={styles.label}>Description</Text><Text style={styles.value}>{matchedPost?.description}</Text></View>

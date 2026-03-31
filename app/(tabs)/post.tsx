@@ -19,10 +19,13 @@ import { matchItems } from "@/services/api";
 export default function PostScreen() {
   const [type, setType] = useState<"lost" | "found">("lost");
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("Others");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const categories = ["Bag", "Wallet", "Phone", "Keys", "ID/Cards", "Clothing", "Electronics", "Others"];
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -61,6 +64,7 @@ export default function PostScreen() {
         description,
         location,
         imageUrl,
+        category,
         userId: auth.currentUser?.uid,
         userName: auth.currentUser?.displayName || "Anonymous",
         createdAt: new Date().toISOString(),
@@ -118,6 +122,7 @@ export default function PostScreen() {
       setTitle("");
       setDescription("");
       setLocation("");
+      setCategory("Others");
       setImage(null);
     } catch (error: any) {
       Alert.alert("Error", error.message);
@@ -146,6 +151,19 @@ export default function PostScreen() {
       </View>
 
       <TextInput style={styles.input} placeholder="Item Title" value={title} onChangeText={setTitle} />
+
+      <Text style={styles.label}>Category</Text>
+      <View style={styles.categoryGrid}>
+        {categories.map((cat) => (
+          <TouchableOpacity
+            key={cat}
+            style={[styles.categoryBtn, category === cat && styles.categoryBtnActive]}
+            onPress={() => setCategory(cat)}
+          >
+            <Text style={[styles.categoryText, category === cat && styles.categoryTextActive]}>{cat}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
       <TextInput
         style={[styles.input, { height: 100 }]}
         placeholder="Description"
@@ -179,6 +197,12 @@ const styles = StyleSheet.create({
   toggleText: { fontWeight: "bold", color: "#687076" },
   toggleTextActive: { color: "#fff" },
   input: { backgroundColor: "#fff", borderRadius: 10, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: "#ddd", fontSize: 16 },
+  label: { fontSize: 14, fontWeight: "600", color: "#687076", marginBottom: 8 },
+  categoryGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 12 },
+  categoryBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: "#ddd", backgroundColor: "#fff" },
+  categoryBtnActive: { backgroundColor: "#0a7ea4", borderColor: "#0a7ea4" },
+  categoryText: { fontSize: 13, color: "#687076", fontWeight: "500" },
+  categoryTextActive: { color: "#fff", fontWeight: "bold" },
   imagePicker: { backgroundColor: "#fff", borderRadius: 10, borderWidth: 1, borderColor: "#ddd", height: 150, justifyContent: "center", alignItems: "center", marginBottom: 16 },
   imagePickerText: { color: "#687076", fontSize: 16 },
   imagePreview: { width: "100%", height: "100%", borderRadius: 10 },

@@ -47,6 +47,8 @@ export default function PostDetailsScreen() {
         <View style={styles.divider} />
         <View style={styles.row}><Text style={styles.label}>Type</Text><Text style={styles.value}>{post?.type?.toUpperCase()}</Text></View>
         <View style={styles.divider} />
+        <View style={styles.row}><Text style={styles.label}>Category</Text><Text style={styles.value}>{post?.category || "Others"}</Text></View>
+        <View style={styles.divider} />
         <View style={styles.row}><Text style={styles.label}>Description</Text><Text style={styles.value}>{post?.description}</Text></View>
         <View style={styles.divider} />
         <View style={styles.row}><Text style={styles.label}>Location</Text><Text style={styles.value}>{post?.location}</Text></View>
