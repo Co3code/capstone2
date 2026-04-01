@@ -17,14 +17,16 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+
+  
   const handleLogin = async () => {
     if (!email || !password) return Alert.alert("Error", "Please fill in all fields");
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.replace("/(tabs)");
-    } catch (error: any) {
-      Alert.alert("Login Failed", error.message);
+    } catch {
+      Alert.alert("Login Failed", "Invalid email or password.");
     } finally {
       setLoading(false);
     }

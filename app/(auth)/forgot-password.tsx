@@ -24,8 +24,8 @@ export default function ForgotPasswordScreen() {
       Alert.alert("Success", "Password reset email sent! Check your inbox.", [
         { text: "OK", onPress: () => router.back() },
       ]);
-    } catch (error: any) {
-      Alert.alert("Error", error.message);
+    } catch {
+      Alert.alert("Error", "If this email is registered, a reset link will be sent.");
     } finally {
       setLoading(false);
     }

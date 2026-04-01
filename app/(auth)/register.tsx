@@ -38,8 +38,8 @@ export default function RegisterScreen() {
       Alert.alert("Success", "Account created! Please login.", [
         { text: "OK", onPress: () => router.replace("/(auth)/login") },
       ]);
-    } catch (error: any) {
-      Alert.alert("Registration Failed", error.message);
+    } catch {
+      Alert.alert("Registration Failed", "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
