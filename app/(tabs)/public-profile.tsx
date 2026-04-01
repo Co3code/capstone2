@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   View, Text, StyleSheet, ActivityIndicator,
-  TouchableOpacity, Linking, ScrollView, FlatList,
+  TouchableOpacity, Linking, ScrollView,
 } from "react-native";
 import { doc, getDoc, collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { db } from "@/services/firebase";
@@ -29,7 +29,7 @@ export default function PublicProfileScreen() {
       setLoading(false);
     };
     fetchProfile();
-  }, []);
+  }, [userId]);
 
   if (loading) return <ActivityIndicator color="#0a7ea4" style={{ flex: 1, marginTop: 100 }} />;
 
