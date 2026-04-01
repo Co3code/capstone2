@@ -53,7 +53,7 @@ export default function PostDetailsScreen() {
         <View style={styles.divider} />
         <View style={styles.row}><Text style={styles.label}>Location</Text><Text style={styles.value}>{post?.location}</Text></View>
         <View style={styles.divider} />
-        <View style={styles.row}><Text style={styles.label}>Posted by</Text><Text style={styles.value}>{post?.userName}</Text></View>
+        <View style={styles.row}><Text style={styles.label}>Posted by</Text><TouchableOpacity onPress={() => router.push({ pathname: "/(tabs)/public-profile", params: { userId: post?.userId } })}><Text style={[styles.value, styles.link]}>{post?.userName}</Text></TouchableOpacity></View>
         <View style={styles.divider} />
         <View style={styles.row}><Text style={styles.label}>Date</Text><Text style={styles.value}>{new Date(post?.createdAt).toLocaleDateString()}</Text></View>
         <View style={styles.divider} />
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 8 },
   label: { fontSize: 13, color: "#687076", fontWeight: "600", flex: 1 },
   value: { fontSize: 13, color: "#11181C", flex: 2, textAlign: "right" },
+  link: { color: "#0a7ea4" },
   badge: { alignSelf: "flex-start", borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, marginBottom: 12 },
   badgeLost: { backgroundColor: "#fff0f0", borderWidth: 1, borderColor: "#ff6b6b" },
   badgeFound: { backgroundColor: "#f0fff4", borderWidth: 1, borderColor: "#51cf66" },

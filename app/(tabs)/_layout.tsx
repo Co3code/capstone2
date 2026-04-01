@@ -47,6 +47,10 @@ export default function TabsLayout() {
         name="post-details"
         options={{ href: null, headerShown: false }}
       />
+      <Tabs.Screen
+        name="public-profile"
+        options={{ href: null, headerShown: false }}
+      />
     </Tabs>
   );
 }
