@@ -11,6 +11,7 @@ import {
   Image,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import { collection, addDoc, getDocs, query, where, doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "@/services/firebase";
 import { uploadImage } from "@/services/cloudinary";
@@ -27,12 +28,31 @@ export default function PostScreen() {
 
   const categories = ["Bag", "Wallet", "Phone", "Keys", "ID/Cards", "Clothing", "Electronics", "Others"];
 
+  const processImage = async (uri: string) => {
+    const manipulated = await ImageManipulator.manipulateAsync(
+      uri,
+      [{ resize: { width: 800 } }],
+      { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+    );
+    setImage(manipulated.uri);
+  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
-      quality: 0.7,
+      quality: 1,
     });
-    if (!result.canceled) setImage(result.assets[0].uri);
+    if (!result.canceled) await processImage(result.assets[0].uri);
+  };
+
+  const takePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) return Alert.alert("Permission required", "Camera permission is required to take a photo.");
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ["images"],
+      quality: 1,
+    });
+    if (!result.canceled) await processImage(result.assets[0].uri);
   };
 
   const handleSubmit = async () => {
@@ -173,13 +193,24 @@ export default function PostScreen() {
       />
       <TextInput style={styles.input} placeholder="Location" value={location} onChangeText={setLocation} />
 
-      <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
-        {image ? (
+      <Text style={styles.label}>Photo</Text>
+      {image ? (
+        <View style={styles.imageContainer}>
           <Image source={{ uri: image }} style={styles.imagePreview} />
-        ) : (
-          <Text style={styles.imagePickerText}> Tap to add a photo</Text>
-        )}
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.removeImage} onPress={() => setImage(null)}>
+            <Text style={styles.removeImageText}>Remove</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={styles.photoButtons}>
+          <TouchableOpacity style={styles.photoBtn} onPress={takePhoto}>
+            <Text style={styles.photoBtnText}>Camera</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.photoBtn} onPress={pickImage}>
+            <Text style={styles.photoBtnText}>Gallery</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Submit Post</Text>}
@@ -205,7 +236,13 @@ const styles = StyleSheet.create({
   categoryTextActive: { color: "#fff", fontWeight: "bold" },
   imagePicker: { backgroundColor: "#fff", borderRadius: 10, borderWidth: 1, borderColor: "#ddd", height: 150, justifyContent: "center", alignItems: "center", marginBottom: 16 },
   imagePickerText: { color: "#687076", fontSize: 16 },
-  imagePreview: { width: "100%", height: "100%", borderRadius: 10 },
+  imageContainer: { marginBottom: 16 },
+  imagePreview: { width: "100%", height: 180, borderRadius: 10, marginBottom: 8 },
+  removeImage: { alignSelf: "flex-end", backgroundColor: "#fff0f0", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: "#ff6b6b" },
+  removeImageText: { color: "#ff6b6b", fontSize: 12, fontWeight: "bold" },
+  photoButtons: { flexDirection: "row", gap: 12, marginBottom: 16 },
+  photoBtn: { flex: 1, backgroundColor: "#fff", borderWidth: 1, borderColor: "#0a7ea4", borderRadius: 10, padding: 14, alignItems: "center" },
+  photoBtnText: { color: "#0a7ea4", fontWeight: "bold", fontSize: 15 },
   button: { backgroundColor: "#0a7ea4", padding: 16, borderRadius: 10, alignItems: "center" },
   buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
 });

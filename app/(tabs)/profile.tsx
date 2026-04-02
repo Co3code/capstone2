@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   View, Text, FlatList, StyleSheet, TouchableOpacity,
-  ActivityIndicator, Alert, TextInput, Modal, ScrollView,
+  ActivityIndicator, Alert, TextInput, Modal,
 } from "react-native";
 import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
@@ -16,6 +16,7 @@ type Post = {
   location: string;
   status: string;
   createdAt: string;
+  category?: string;
 };
 
 export default function ProfileScreen() {
@@ -44,7 +45,10 @@ export default function ProfileScreen() {
       setLoading(false);
     });
     return unsubscribe;
-  }, []);
+  }, [user?.uid]);
+
+  const matched = posts.filter((p) => p.status === "matched").length;
+  const unmatched = posts.filter((p) => p.status === "unmatched").length;
 
   const handleLogout = async () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -77,9 +81,9 @@ export default function ProfileScreen() {
     setModalVisible(false);
   };
 
-  return (
-    <View style={styles.container}>
-      {/* Profile Header */}
+  const ListHeader = () => (
+    <View>
+      {/* Profile Card */}
       <View style={styles.profileCard}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{user?.displayName?.charAt(0).toUpperCase() || "U"}</Text>
@@ -91,6 +95,23 @@ export default function ProfileScreen() {
         </View>
       </View>
 
+      {/* Stats */}
+      <View style={styles.statsRow}>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>{posts.length}</Text>
+          <Text style={styles.statLabel}>Total Posts</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={[styles.statNumber, { color: "#0a7ea4" }]}>{matched}</Text>
+          <Text style={styles.statLabel}>Matched</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={[styles.statNumber, { color: "#ff6b6b" }]}>{unmatched}</Text>
+          <Text style={styles.statLabel}>Unmatched</Text>
+        </View>
+      </View>
+
+      {/* Action Buttons */}
       <View style={styles.actionRow}>
         <TouchableOpacity style={styles.editBtn} onPress={() => { setEditPhone(phone); setModalVisible(true); }}>
           <Text style={styles.editBtnText}>Edit Contact</Text>
@@ -101,32 +122,49 @@ export default function ProfileScreen() {
       </View>
 
       <Text style={styles.sectionTitle}>My Posts</Text>
+    </View>
+  );
 
+  return (
+    <View style={styles.container}>
       {loading ? (
         <ActivityIndicator color="#0a7ea4" style={{ marginTop: 20 }} />
-      ) : posts.length === 0 ? (
-        <Text style={styles.empty}>You haven't posted anything yet.</Text>
       ) : (
         <FlatList
           data={posts}
           keyExtractor={(item) => item.id}
+          ListHeaderComponent={ListHeader}
+          ListEmptyComponent={<Text style={styles.empty}>{"You haven't posted anything yet."}</Text>}
           renderItem={({ item }) => (
-            <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => router.push({ pathname: "/(tabs)/post-details", params: { postId: item.id } })}
+            >
               <View style={styles.cardRow}>
                 <View style={[styles.badge, item.type === "lost" ? styles.badgeLost : styles.badgeFound]}>
-                  <Text style={[styles.badgeText, item.type === "lost" ? styles.badgeTextLost : styles.badgeTextFound]}>{item.type.toUpperCase()}</Text>
+                  <Text style={[styles.badgeText, item.type === "lost" ? styles.badgeTextLost : styles.badgeTextFound]}>
+                    {item.type.toUpperCase()}
+                  </Text>
                 </View>
                 <View style={[styles.statusBadge, item.status === "matched" ? styles.statusMatched : styles.statusUnmatched]}>
-                  <Text style={[styles.statusText, item.status === "matched" ? styles.statusTextMatched : styles.statusTextUnmatched]}>{item.status === "matched" ? "Matched" : "Unmatched"}</Text>
+                  <Text style={[styles.statusText, item.status === "matched" ? styles.statusTextMatched : styles.statusTextUnmatched]}>
+                    {item.status === "matched" ? "Matched" : "Unmatched"}
+                  </Text>
                 </View>
               </View>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-              <Text style={styles.cardDesc}>{item.description}</Text>
-              <Text style={styles.cardMeta}>📍 {item.location}</Text>
+              <View style={styles.detailRow}><Text style={styles.detailLabel}>Title</Text><Text style={styles.detailValue}>{item.title}</Text></View>
+              <View style={styles.divider} />
+              <View style={styles.detailRow}><Text style={styles.detailLabel}>Description</Text><Text style={styles.detailValue} numberOfLines={2}>{item.description}</Text></View>
+              <View style={styles.divider} />
+              <View style={styles.detailRow}><Text style={styles.detailLabel}>Location</Text><Text style={styles.detailValue}>{item.location}</Text></View>
+              <View style={styles.divider} />
+              <View style={styles.detailRow}><Text style={styles.detailLabel}>Category</Text><Text style={styles.detailValue}>{item.category || "Others"}</Text></View>
+              <View style={styles.divider} />
+              <View style={styles.detailRow}><Text style={styles.detailLabel}>Date</Text><Text style={styles.detailValue}>{new Date(item.createdAt).toLocaleDateString()}</Text></View>
               <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDeletePost(item.id)}>
                 <Text style={styles.deleteBtnText}>Delete</Text>
               </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
@@ -164,6 +202,10 @@ const styles = StyleSheet.create({
   name: { fontSize: 18, fontWeight: "bold", color: "#11181C" },
   email: { fontSize: 12, color: "#687076", marginTop: 2 },
   phone: { fontSize: 12, color: "#687076", marginTop: 2 },
+  statsRow: { flexDirection: "row", gap: 8, marginBottom: 12 },
+  statCard: { flex: 1, backgroundColor: "#fff", borderRadius: 12, padding: 12, alignItems: "center", elevation: 2 },
+  statNumber: { fontSize: 22, fontWeight: "bold", color: "#11181C" },
+  statLabel: { fontSize: 11, color: "#687076", marginTop: 2 },
   actionRow: { flexDirection: "row", gap: 8, marginBottom: 16 },
   editBtn: { flex: 1, backgroundColor: "#e8f4f8", padding: 10, borderRadius: 10, alignItems: "center" },
   editBtnText: { color: "#0a7ea4", fontWeight: "bold" },
@@ -172,7 +214,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: "bold", color: "#0a7ea4", marginBottom: 12 },
   empty: { textAlign: "center", color: "#687076", marginTop: 40 },
   card: { backgroundColor: "#fff", borderRadius: 16, padding: 16, marginBottom: 12, elevation: 2 },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 8 },
+  cardRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
   badge: { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
   badgeLost: { backgroundColor: "#fff0f0", borderWidth: 1, borderColor: "#ff6b6b" },
   badgeFound: { backgroundColor: "#f0fff4", borderWidth: 1, borderColor: "#51cf66" },
@@ -185,10 +227,11 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 11, fontWeight: "bold" },
   statusTextMatched: { color: "#0a7ea4" },
   statusTextUnmatched: { color: "#aaa" },
-  cardTitle: { fontSize: 16, fontWeight: "bold", color: "#11181C", marginBottom: 4 },
-  cardDesc: { fontSize: 14, color: "#687076", marginBottom: 8 },
-  cardMeta: { fontSize: 12, color: "#aaa", marginBottom: 8 },
-  deleteBtn: { alignSelf: "flex-end", backgroundColor: "#fff0f0", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: "#ff6b6b" },
+  detailRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 6 },
+  detailLabel: { fontSize: 12, color: "#687076", fontWeight: "600", flex: 1 },
+  detailValue: { fontSize: 12, color: "#11181C", flex: 2, textAlign: "right" },
+  divider: { height: 1, backgroundColor: "#f0f0f0" },
+  deleteBtn: { alignSelf: "flex-end", backgroundColor: "#fff0f0", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: "#ff6b6b", marginTop: 10 },
   deleteBtnText: { color: "#ff6b6b", fontSize: 12, fontWeight: "bold" },
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", padding: 24 },
   modalCard: { backgroundColor: "#fff", borderRadius: 16, padding: 24 },

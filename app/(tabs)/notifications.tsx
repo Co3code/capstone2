@@ -32,13 +32,26 @@ export default function NotificationsScreen() {
     return unsubscribe;
   }, []);
 
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Notifications</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Notifications</Text>
+        {unreadCount > 0 && (
+          <View style={styles.unreadBadge}>
+            <Text style={styles.unreadBadgeText}>{unreadCount} new</Text>
+          </View>
+        )}
+      </View>
+
       {loading ? (
         <ActivityIndicator color="#0a7ea4" style={{ marginTop: 20 }} />
       ) : notifications.length === 0 ? (
-        <Text style={styles.empty}>No notifications yet.</Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyTitle}>No notifications yet</Text>
+          <Text style={styles.emptyDesc}>You will be notified when a match is found for your item.</Text>
+        </View>
       ) : (
         <FlatList
           data={notifications}
@@ -48,9 +61,21 @@ export default function NotificationsScreen() {
               style={[styles.card, !item.read && styles.unread]}
               onPress={() => item.matchedPostId && router.push({ pathname: "/(tabs)/match-details", params: { postId: item.matchedPostId, myPostId: item.myPostId, score: item.score } })}
             >
+              <View style={styles.cardHeader}>
+                <View style={styles.matchLabel}>
+                  <Text style={styles.matchLabelText}>Match Found</Text>
+                </View>
+                {item.score && (
+                  <View style={styles.scoreBadge}>
+                    <Text style={styles.scoreText}>{Math.round(item.score * 100)}% match</Text>
+                  </View>
+                )}
+              </View>
               <Text style={styles.message}>{item.message}</Text>
-              <Text style={styles.time}>{new Date(item.createdAt).toLocaleDateString()}</Text>
-              {item.matchedPostId && <Text style={styles.tap}>Tap to view match →</Text>}
+              <View style={styles.cardFooter}>
+                <Text style={styles.time}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+                {item.matchedPostId && <Text style={styles.tap}>Tap to view match</Text>}
+              </View>
             </TouchableOpacity>
           )}
         />
@@ -61,11 +86,22 @@ export default function NotificationsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f5f5f5", padding: 16, paddingTop: 52 },
-  title: { fontSize: 24, fontWeight: "bold", color: "#0a7ea4", marginBottom: 16 },
-  empty: { textAlign: "center", color: "#687076", marginTop: 40 },
-  card: { backgroundColor: "#fff", borderRadius: 12, padding: 16, marginBottom: 12, elevation: 2 },
-  unread: { borderLeftWidth: 4, borderLeftColor: "#0a7ea4" },
-  message: { fontSize: 14, color: "#11181C", marginBottom: 4 },
+  header: { flexDirection: "row", alignItems: "center", marginBottom: 16, gap: 8 },
+  title: { fontSize: 24, fontWeight: "bold", color: "#0a7ea4" },
+  unreadBadge: { backgroundColor: "#0a7ea4", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
+  unreadBadgeText: { color: "#fff", fontSize: 11, fontWeight: "bold" },
+  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", marginTop: 60 },
+  emptyTitle: { fontSize: 18, fontWeight: "bold", color: "#11181C", marginBottom: 8 },
+  emptyDesc: { fontSize: 14, color: "#687076", textAlign: "center", paddingHorizontal: 24 },
+  card: { backgroundColor: "#fff", borderRadius: 16, padding: 16, marginBottom: 12, elevation: 2 },
+  unread: { backgroundColor: "#f0f8ff" },
+  cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
+  matchLabel: { backgroundColor: "#e8f4f8", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
+  matchLabelText: { color: "#0a7ea4", fontSize: 11, fontWeight: "bold" },
+  scoreBadge: { backgroundColor: "#f0fff4", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, borderWidth: 1, borderColor: "#51cf66" },
+  scoreText: { color: "#2f9e44", fontSize: 11, fontWeight: "bold" },
+  message: { fontSize: 14, color: "#11181C", marginBottom: 8, lineHeight: 20 },
+  cardFooter: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   time: { fontSize: 12, color: "#aaa" },
-  tap: { fontSize: 12, color: "#0a7ea4", marginTop: 4 },
+  tap: { fontSize: 12, color: "#0a7ea4", fontWeight: "bold" },
 });
