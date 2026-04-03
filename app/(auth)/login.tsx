@@ -1,24 +1,20 @@
 import { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView,
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
 
-
-  
   const handleLogin = async () => {
     if (!email || !password) return Alert.alert("Error", "Please fill in all fields");
     setLoading(true);
@@ -33,57 +29,117 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.logoContainer}>
-        <View style={styles.logo}>
-          <Text style={styles.logoText}>AI</Text>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+
+        {/* Logo */}
+        <View style={styles.logoContainer}>
+          <View style={styles.logoBadge}>
+            <Ionicons name="search" size={30} color="#238636" />
+          </View>
+          <Text style={styles.appName}>AIFoundIt</Text>
+          <Text style={styles.appTagline}>Lost & Found, Powered by AI</Text>
         </View>
-        <Text style={styles.title}>AIFoundIT</Text>
-        <Text style={styles.subtitle}>Lost & Found AI Matching</Text>
-      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+        {/* Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Sign in</Text>
+          <Text style={styles.cardSubtitle}>to continue to AIFoundIt</Text>
 
-      <TouchableOpacity onPress={() => router.push("/(auth)/forgot-password")}>
-        <Text style={styles.forgot}>Forgot Password?</Text>
-      </TouchableOpacity>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email address</Text>
+            <TextInput
+              style={[styles.input, emailFocused && styles.inputFocused]}
+              placeholder="name@example.com"
+              placeholderTextColor="#484F58"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onFocus={() => setEmailFocused(true)}
+              onBlur={() => setEmailFocused(false)}
+            />
+          </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Login</Text>}
-      </TouchableOpacity>
+          <View style={styles.inputGroup}>
+            <View style={styles.labelRow}>
+              <Text style={styles.label}>Password</Text>
+              <TouchableOpacity onPress={() => router.push("/(auth)/forgot-password")}>
+                <Text style={styles.forgotText}>Forgot password?</Text>
+              </TouchableOpacity>
+            </View>
+            <TextInput
+              style={[styles.input, passwordFocused && styles.inputFocused]}
+              placeholder="••••••••"
+              placeholderTextColor="#484F58"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={() => setPasswordFocused(false)}
+            />
+          </View>
 
-      <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
-        <Text style={styles.link}>{"Don't have an account?"} <Text style={styles.linkBold}>Register</Text></Text>
-      </TouchableOpacity>
-    </View>
+          <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading} activeOpacity={0.85}>
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign in</Text>}
+          </TouchableOpacity>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>New to AIFoundIt? </Text>
+            <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
+              <Text style={styles.footerLink}>Create an account</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 24, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: "#0D1117" },
+  scrollContent: { flexGrow: 1, justifyContent: "center", padding: 24 },
+
   logoContainer: { alignItems: "center", marginBottom: 32 },
-  logo: { width: 72, height: 72, borderRadius: 20, backgroundColor: "#0a7ea4", justifyContent: "center", alignItems: "center", marginBottom: 12, elevation: 4 },
-  logoText: { color: "#fff", fontSize: 24, fontWeight: "bold" },
-  title: { fontSize: 32, fontWeight: "bold", color: "#0a7ea4", textAlign: "center" },
-  subtitle: { fontSize: 14, color: "#687076", textAlign: "center", marginTop: 4 },
-  input: { borderWidth: 1, borderColor: "#ddd", borderRadius: 10, padding: 14, marginBottom: 12, fontSize: 16 },
-  forgot: { color: "#0a7ea4", textAlign: "right", marginBottom: 16 },
-  button: { backgroundColor: "#0a7ea4", padding: 16, borderRadius: 10, alignItems: "center", marginBottom: 16 },
-  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  link: { textAlign: "center", color: "#687076" },
-  linkBold: { color: "#0a7ea4", fontWeight: "bold" },
+  logoBadge: {
+    width: 64, height: 64, borderRadius: 32,
+    backgroundColor: "#161B22", justifyContent: "center",
+    alignItems: "center", marginBottom: 12,
+    borderWidth: 1, borderColor: "#30363D",
+  },
+  appName: { fontSize: 22, fontWeight: "700", color: "#E6EDF3", letterSpacing: -0.5 },
+  appTagline: { fontSize: 13, color: "#8B949E", marginTop: 4 },
+
+  card: {
+    backgroundColor: "#161B22", borderRadius: 12,
+    borderWidth: 1, borderColor: "#30363D",
+    padding: 24, marginBottom: 16,
+  },
+  cardTitle: { fontSize: 24, fontWeight: "700", color: "#E6EDF3", marginBottom: 4 },
+  cardSubtitle: { fontSize: 14, color: "#8B949E", marginBottom: 24 },
+
+  inputGroup: { marginBottom: 16 },
+  labelRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
+  label: { fontSize: 14, fontWeight: "600", color: "#E6EDF3", marginBottom: 8 },
+  forgotText: { fontSize: 13, color: "#58A6FF" },
+
+  input: {
+    backgroundColor: "#0D1117", borderWidth: 1,
+    borderColor: "#30363D", borderRadius: 8,
+    paddingHorizontal: 14, paddingVertical: 12,
+    fontSize: 15, color: "#E6EDF3",
+  },
+  inputFocused: { borderColor: "#58A6FF" },
+
+  button: {
+    backgroundColor: "#238636", borderRadius: 8,
+    paddingVertical: 14, alignItems: "center",
+    marginTop: 8, borderWidth: 1, borderColor: "#2EA043",
+  },
+  buttonText: { color: "#fff", fontSize: 15, fontWeight: "700" },
+
+  footer: { flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 20 },
+  footerText: { fontSize: 14, color: "#8B949E" },
+  footerLink: { fontSize: 14, color: "#58A6FF", fontWeight: "600" },
 });

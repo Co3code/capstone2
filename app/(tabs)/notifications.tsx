@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity }
 import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
 import { db, auth } from "@/services/firebase";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 type Notification = {
   id: string;
@@ -19,11 +20,7 @@ export default function NotificationsScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(
-      collection(db, "notifications"),
-      where("userId", "==", auth.currentUser?.uid),
-      orderBy("createdAt", "desc")
-    );
+    const q = query(collection(db, "notifications"), where("userId", "==", auth.currentUser?.uid), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Notification));
       setNotifications(data);
@@ -36,8 +33,12 @@ export default function NotificationsScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Notifications</Text>
+        <View>
+          <Text style={styles.headerTitle}>Notifications</Text>
+          <Text style={styles.headerSubtitle}>Your match updates</Text>
+        </View>
         {unreadCount > 0 && (
           <View style={styles.unreadBadge}>
             <Text style={styles.unreadBadgeText}>{unreadCount} new</Text>
@@ -46,9 +47,10 @@ export default function NotificationsScreen() {
       </View>
 
       {loading ? (
-        <ActivityIndicator color="#0a7ea4" style={{ marginTop: 20 }} />
+        <ActivityIndicator color="#238636" style={{ marginTop: 20 }} />
       ) : notifications.length === 0 ? (
         <View style={styles.emptyContainer}>
+          <Ionicons name="notifications-outline" size={48} color="#E2E8F0" />
           <Text style={styles.emptyTitle}>No notifications yet</Text>
           <Text style={styles.emptyDesc}>You will be notified when a match is found for your item.</Text>
         </View>
@@ -56,6 +58,7 @@ export default function NotificationsScreen() {
         <FlatList
           data={notifications}
           keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[styles.card, !item.read && styles.unread]}
@@ -63,7 +66,8 @@ export default function NotificationsScreen() {
             >
               <View style={styles.cardHeader}>
                 <View style={styles.matchLabel}>
-                  <Text style={styles.matchLabelText}>Match Found</Text>
+                  <Ionicons name="checkmark-circle" size={12} color="#238636" />
+                  <Text style={styles.matchLabelText}> Match Found</Text>
                 </View>
                 {item.score && (
                   <View style={styles.scoreBadge}>
@@ -74,7 +78,12 @@ export default function NotificationsScreen() {
               <Text style={styles.message}>{item.message}</Text>
               <View style={styles.cardFooter}>
                 <Text style={styles.time}>{new Date(item.createdAt).toLocaleDateString()}</Text>
-                {item.matchedPostId && <Text style={styles.tap}>Tap to view match</Text>}
+                {item.matchedPostId && (
+                  <View style={styles.tapRow}>
+                    <Text style={styles.tap}>View match</Text>
+                    <Ionicons name="chevron-forward" size={12} color="#238636" />
+                  </View>
+                )}
               </View>
             </TouchableOpacity>
           )}
@@ -85,23 +94,28 @@ export default function NotificationsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f5f5", padding: 16, paddingTop: 52 },
-  header: { flexDirection: "row", alignItems: "center", marginBottom: 16, gap: 8 },
-  title: { fontSize: 24, fontWeight: "bold", color: "#0a7ea4" },
-  unreadBadge: { backgroundColor: "#0a7ea4", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
-  unreadBadgeText: { color: "#fff", fontSize: 11, fontWeight: "bold" },
-  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", marginTop: 60 },
-  emptyTitle: { fontSize: 18, fontWeight: "bold", color: "#11181C", marginBottom: 8 },
-  emptyDesc: { fontSize: 14, color: "#687076", textAlign: "center", paddingHorizontal: 24 },
-  card: { backgroundColor: "#fff", borderRadius: 16, padding: 16, marginBottom: 12, elevation: 2 },
-  unread: { backgroundColor: "#f0f8ff" },
+  container: { flex: 1, backgroundColor: "#F6F8FA", padding: 16, paddingTop: 52 },
+
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
+  headerTitle: { fontSize: 22, fontWeight: "800", color: "#0D1117", letterSpacing: -0.5 },
+  headerSubtitle: { fontSize: 12, color: "#8B949E", marginTop: 2 },
+  unreadBadge: { backgroundColor: "#238636", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
+  unreadBadgeText: { color: "#fff", fontSize: 11, fontWeight: "700" },
+
+  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", marginTop: 60, gap: 8 },
+  emptyTitle: { fontSize: 18, fontWeight: "700", color: "#0D1117" },
+  emptyDesc: { fontSize: 14, color: "#8B949E", textAlign: "center", paddingHorizontal: 24 },
+
+  card: { backgroundColor: "#fff", borderRadius: 12, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: "#E2E8F0" },
+  unread: { borderColor: "#238636", backgroundColor: "#F0FFF4" },
   cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
-  matchLabel: { backgroundColor: "#e8f4f8", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
-  matchLabelText: { color: "#0a7ea4", fontSize: 11, fontWeight: "bold" },
-  scoreBadge: { backgroundColor: "#f0fff4", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, borderWidth: 1, borderColor: "#51cf66" },
-  scoreText: { color: "#2f9e44", fontSize: 11, fontWeight: "bold" },
-  message: { fontSize: 14, color: "#11181C", marginBottom: 8, lineHeight: 20 },
+  matchLabel: { flexDirection: "row", alignItems: "center", backgroundColor: "#F0FFF4", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: "#51CF66" },
+  matchLabelText: { color: "#238636", fontSize: 11, fontWeight: "700" },
+  scoreBadge: { backgroundColor: "#F6F8FA", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: "#E2E8F0" },
+  scoreText: { color: "#0D1117", fontSize: 11, fontWeight: "700" },
+  message: { fontSize: 14, color: "#0D1117", marginBottom: 10, lineHeight: 20 },
   cardFooter: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  time: { fontSize: 12, color: "#aaa" },
-  tap: { fontSize: 12, color: "#0a7ea4", fontWeight: "bold" },
+  time: { fontSize: 12, color: "#8B949E" },
+  tapRow: { flexDirection: "row", alignItems: "center" },
+  tap: { fontSize: 12, color: "#238636", fontWeight: "700" },
 });
