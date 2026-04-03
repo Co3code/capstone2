@@ -19,7 +19,7 @@ export default function PostDetailsScreen() {
       setLoading(false);
     };
     fetchPost();
-  }, []);
+  }, [postId]);
 
   if (loading) return <ActivityIndicator color="#0a7ea4" style={{ flex: 1, marginTop: 100 }} />;
 
