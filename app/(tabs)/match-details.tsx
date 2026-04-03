@@ -4,7 +4,7 @@ import {
   TouchableOpacity, Linking, ScrollView
 } from "react-native";
 import { doc, getDoc } from "firebase/firestore";
-import { db, auth } from "@/services/firebase";
+import { db } from "@/services/firebase";
 import { useLocalSearchParams, router } from "expo-router";
 
 export default function MatchDetailsScreen() {
@@ -34,7 +34,7 @@ export default function MatchDetailsScreen() {
       setLoading(false);
     };
     fetchDetails();
-  }, []);
+  }, [postId,myPostId]);
 
   if (loading) return <ActivityIndicator color="#0a7ea4" style={{ flex: 1, marginTop: 100 }} />;
 

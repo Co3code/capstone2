@@ -50,7 +50,8 @@ npx expo start --tunnel
 Terminal 2:
 ```bash
 cd backend
-python main.py
+venv\Scripts\activate
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Update API_BASE_URL in `services/api.ts` with your local IP address.
+Update API_BASE_URL in `services/api.ts` with your local IP address.  

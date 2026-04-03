@@ -17,6 +17,7 @@ type Post = {
   userName: string;
   createdAt: string;
   imageUrl?: string;
+  category?: string;
 };
 
 export default function HomeScreen() {
