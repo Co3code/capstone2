@@ -14,11 +14,11 @@ export default function ForgotPasswordScreen() {
   const [emailFocused, setEmailFocused] = useState(false);
 
   const handleReset = async () => {
-    if (!email) return Alert.alert("Error", "Please enter your email");
+    if (!email) return Alert.alert("Error", "Please enter your email address you used to register");
     setLoading(true);
     try {
       await sendPasswordResetEmail(auth, email);
-      Alert.alert("Success", "Password reset email sent! Check your inbox.", [
+      Alert.alert("Success", "  We’ve sent a password reset email. Please check your inbox or spam folder.", [
         { text: "OK", onPress: () => router.back() },
       ]);
     } catch {
@@ -37,14 +37,14 @@ export default function ForgotPasswordScreen() {
           <View style={styles.logoBadge}>
             <Ionicons name="search" size={30} color="#238636" />
           </View>
-          <Text style={styles.appName}>AIFoundIt</Text>
+          <Text style={styles.appName}>AIFoundIT</Text>
           <Text style={styles.appTagline}>Lost & Found, Powered by AI</Text>
         </View>
 
         {/* Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Reset password</Text>
-          <Text style={styles.cardSubtitle}>Enter your email and {"we'll"} send you a reset link</Text>
+          <Text style={styles.cardSubtitle}>Enter the email address you used to register</Text>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email address</Text>

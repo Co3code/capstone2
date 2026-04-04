@@ -17,6 +17,8 @@ export default function RegisterScreen() {
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleRegister = async () => {
     if (!name || !email || !phone || !password || !confirm) return Alert.alert("Error", "Please fill in all fields");
@@ -54,32 +56,49 @@ export default function RegisterScreen() {
         {/* Logo */}
         <View style={styles.logoContainer}>
           <View style={styles.logoBadge}>
-            <Ionicons name="search" size={30} color="#238636" />
+            <Ionicons name="scan" size={30} color="#238636" />
           </View>
-          <Text style={styles.appName}>AIFoundIt</Text>
+          <Text style={styles.appName}>AIFoundIT</Text>
           <Text style={styles.appTagline}>Lost & Found, Powered by AI</Text>
         </View>
 
         {/* Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Create account</Text>
-          <Text style={styles.cardSubtitle}>Join AIFoundIt today</Text>
+          <Text style={styles.cardSubtitle}>Join AIFoundIT today</Text>
 
           {fields.map((field) => (
             <View key={field.key} style={styles.inputGroup}>
               <Text style={styles.label}>{field.label}</Text>
-              <TextInput
-                style={[styles.input, focused === field.key && styles.inputFocused]}
-                placeholder={field.placeholder}
-                placeholderTextColor="#484F58"
-                value={field.value}
-                onChangeText={field.onChange}
-                keyboardType={field.keyboardType || "default"}
-                autoCapitalize={field.autoCapitalize || "words"}
-                secureTextEntry={field.secure || false}
-                onFocus={() => setFocused(field.key)}
-                onBlur={() => setFocused(null)}
-              />
+              {field.secure ? (
+                <View style={[styles.inputRow, focused === field.key && styles.inputFocused]}>
+                  <TextInput
+                    style={styles.inputInner}
+                    placeholder={field.placeholder}
+                    placeholderTextColor="#484F58"
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    secureTextEntry={field.key === "password" ? !showPassword : !showConfirm}
+                    onFocus={() => setFocused(field.key)}
+                    onBlur={() => setFocused(null)}
+                  />
+                  <TouchableOpacity onPress={() => field.key === "password" ? setShowPassword(!showPassword) : setShowConfirm(!showConfirm)}>
+                    <Ionicons name={(field.key === "password" ? showPassword : showConfirm) ? "eye-off-outline" : "eye-outline"} size={18} color="#484F58" />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TextInput
+                  style={[styles.input, focused === field.key && styles.inputFocused]}
+                  placeholder={field.placeholder}
+                  placeholderTextColor="#484F58"
+                  value={field.value}
+                  onChangeText={field.onChange}
+                  keyboardType={field.keyboardType || "default"}
+                  autoCapitalize={field.autoCapitalize || "words"}
+                  onFocus={() => setFocused(field.key)}
+                  onBlur={() => setFocused(null)}
+                />
+              )}
             </View>
           ))}
 
@@ -132,6 +151,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14, paddingVertical: 12,
     fontSize: 15, color: "#E6EDF3",
   },
+  inputRow: {
+    flexDirection: "row", alignItems: "center",
+    backgroundColor: "#0D1117", borderWidth: 1,
+    borderColor: "#30363D", borderRadius: 8,
+    paddingHorizontal: 14, paddingVertical: 12,
+  },
+  inputInner: { flex: 1, fontSize: 15, color: "#E6EDF3" },
   inputFocused: { borderColor: "#58A6FF" },
 
   button: {

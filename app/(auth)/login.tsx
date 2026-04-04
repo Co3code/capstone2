@@ -14,6 +14,7 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) return Alert.alert("Error", "Please fill in all fields");
@@ -35,16 +36,16 @@ export default function LoginScreen() {
         {/* Logo */}
         <View style={styles.logoContainer}>
           <View style={styles.logoBadge}>
-            <Ionicons name="search" size={30} color="#238636" />
+            <Ionicons name="scan" size={30} color="#238636" />
           </View>
-          <Text style={styles.appName}>AIFoundIt</Text>
+          <Text style={styles.appName}>AIFoundIT</Text>
           <Text style={styles.appTagline}>Lost & Found, Powered by AI</Text>
         </View>
 
         {/* Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Sign in</Text>
-          <Text style={styles.cardSubtitle}>to continue to AIFoundIt</Text>
+          <Text style={styles.cardSubtitle}>to continue to AIFoundIT</Text>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email address</Text>
@@ -68,16 +69,21 @@ export default function LoginScreen() {
                 <Text style={styles.forgotText}>Forgot password?</Text>
               </TouchableOpacity>
             </View>
-            <TextInput
-              style={[styles.input, passwordFocused && styles.inputFocused]}
-              placeholder="••••••••"
-              placeholderTextColor="#484F58"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              onFocus={() => setPasswordFocused(true)}
-              onBlur={() => setPasswordFocused(false)}
-            />
+            <View style={[styles.inputRow, passwordFocused && styles.inputFocused]}>
+              <TextInput
+                style={styles.inputInner}
+                placeholder="••••••••"
+                placeholderTextColor="#484F58"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                onFocus={() => setPasswordFocused(true)}
+                onBlur={() => setPasswordFocused(false)}
+              />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={18} color="#484F58" />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading} activeOpacity={0.85}>
@@ -85,7 +91,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>New to AIFoundIt? </Text>
+            <Text style={styles.footerText}>New to AIFoundIT? </Text>
             <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
               <Text style={styles.footerLink}>Create an account</Text>
             </TouchableOpacity>
@@ -130,6 +136,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14, paddingVertical: 12,
     fontSize: 15, color: "#E6EDF3",
   },
+  inputRow: {
+    flexDirection: "row", alignItems: "center",
+    backgroundColor: "#0D1117", borderWidth: 1,
+    borderColor: "#30363D", borderRadius: 8,
+    paddingHorizontal: 14, paddingVertical: 12,
+  },
+  inputInner: { flex: 1, fontSize: 15, color: "#E6EDF3" },
   inputFocused: { borderColor: "#58A6FF" },
 
   button: {
