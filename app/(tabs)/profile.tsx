@@ -129,7 +129,7 @@ export default function ProfileScreen() {
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Ionicons name="document-outline" size={48} color="#E2E8F0" />
-              <Text style={styles.empty}>You haven't posted anything yet.</Text>
+              <Text style={styles.empty}>{"You haven't"} posted anything yet.</Text>
             </View>
           }
           renderItem={({ item }) => (
