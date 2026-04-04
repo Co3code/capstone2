@@ -153,10 +153,12 @@ export default function ProfileScreen() {
               <View style={styles.detailRow}><Text style={styles.detailLabel}>Category</Text><Text style={styles.detailValue}>{item.category || "Others"}</Text></View>
               <View style={styles.divider} />
               <View style={styles.detailRow}><Text style={styles.detailLabel}>Date</Text><Text style={styles.detailValue}>{new Date(item.createdAt).toLocaleDateString()}</Text></View>
-              <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDeletePost(item.id)}>
-                <Ionicons name="trash-outline" size={13} color="#FF6B6B" />
-                <Text style={styles.deleteBtnText}> Delete</Text>
-              </TouchableOpacity>
+              {item.status !== "matched" && (
+                <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDeletePost(item.id)}>
+                  <Ionicons name="trash-outline" size={13} color="#FF6B6B" />
+                  <Text style={styles.deleteBtnText}> Delete</Text>
+                </TouchableOpacity>
+              )}
             </TouchableOpacity>
           )}
         />
