@@ -12,6 +12,17 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyDRAaxVIjMu9BDXqJSGvb3WpucCgk2UOHM",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "aifoundit-app.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "aifoundit-app",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "aifoundit-app.firebasestorage.app",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "335758254477",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:335758254477:web:73e4589eaf3d7a69bc9dc4",
+        "EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME": "dks2wwyym",
+        "EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET": "lost-found-uploads",
+        "EXPO_PUBLIC_API_URL": "https://capstone2-zgpz.onrender.com"
       }
     },
     "production": {
