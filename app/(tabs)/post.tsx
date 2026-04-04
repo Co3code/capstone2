@@ -53,7 +53,7 @@ export default function PostScreen() {
       let imageUrl = null;
       if (image) {
         try { imageUrl = await uploadImage(image); }
-        catch (uploadError: any) { return Alert.alert("Upload Failed", "Image upload failed. Please check your internet connection."); }
+        catch { return Alert.alert("Upload Failed", "Image upload failed. Please check your internet connection."); }
       }
 
       const docRef = await addDoc(collection(db, "posts"), {
