@@ -6,7 +6,8 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { useLocalSearchParams, router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { ArrowLeft, Link, ImageOff } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function MatchDetailsScreen() {
   const { postId, score, myPostId } = useLocalSearchParams();
@@ -33,20 +34,20 @@ export default function MatchDetailsScreen() {
     fetchDetails();
   }, [postId, myPostId]);
 
-  if (loading) return <ActivityIndicator color="#238636" style={{ flex: 1, marginTop: 100 }} />;
+  if (loading) return <ActivityIndicator color="#FF416C" style={{ flex: 1, marginTop: 100, backgroundColor: "#070709" }} />;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
       <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-        <Ionicons name="arrow-back" size={16} color="#238636" />
+        <ArrowLeft size={16} color="#FF416C" strokeWidth={1.5} />
         <Text style={styles.backText}> Back</Text>
       </TouchableOpacity>
 
       {/* Header */}
       <View style={styles.matchHeader}>
-        <View style={styles.matchIconContainer}>
-          <Ionicons name="checkmark-circle" size={28} color="#238636" />
-        </View>
+        <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.matchIconContainer} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+          <Link size={24} color="#fff" strokeWidth={1.5} />
+        </LinearGradient>
         <Text style={styles.title}>Match Found!</Text>
         <View style={styles.scoreBadge}>
           <Text style={styles.scoreText}>{Math.round(Number(score) * 100)}% Similarity</Text>
@@ -65,14 +66,14 @@ export default function MatchDetailsScreen() {
             <Image source={{ uri: myPost.imageUrl }} style={styles.photo} />
           ) : (
             <View style={styles.noPhoto}>
-              <Ionicons name="image-outline" size={24} color="#CBD5E1" />
+              <ImageOff size={22} color="rgba(255,255,255,0.2)" strokeWidth={1.5} />
             </View>
           )}
           <Text style={styles.photoLabel} numberOfLines={2}>{myPost?.title || "Your Item"}</Text>
         </View>
 
         <View style={styles.matchIcon}>
-          <Ionicons name="link" size={22} color="#238636" />
+          <Link size={20} color="#FF416C" strokeWidth={1.5} />
         </View>
 
         <View style={styles.photoCard}>
@@ -85,7 +86,7 @@ export default function MatchDetailsScreen() {
             <Image source={{ uri: matchedPost.imageUrl }} style={styles.photo} />
           ) : (
             <View style={styles.noPhoto}>
-              <Ionicons name="image-outline" size={24} color="#CBD5E1" />
+              <ImageOff size={22} color="rgba(255,255,255,0.2)" strokeWidth={1.5} />
             </View>
           )}
           <Text style={styles.photoLabel} numberOfLines={2}>{matchedPost?.title}</Text>
@@ -109,7 +110,7 @@ export default function MatchDetailsScreen() {
       {/* Contact info */}
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Contact the Owner</Text>
-        <View style={styles.row}><Text style={styles.label}>Name</Text><Text style={styles.value}>{matchedUser?.name}</Text></View>
+        <View style={styles.row}><Text style={styles.label}>Name</Text><TouchableOpacity onPress={() => router.push({ pathname: "/(tabs)/public-profile", params: { userId: matchedPost?.userId } })}><Text style={[styles.value, styles.link]}>{matchedUser?.name}</Text></TouchableOpacity></View>
         <View style={styles.divider} />
         <TouchableOpacity style={styles.row} onPress={() => Linking.openURL(`mailto:${matchedUser?.email}`)}>
           <Text style={styles.label}>Email</Text>
@@ -130,36 +131,36 @@ export default function MatchDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F6F8FA", padding: 16, paddingTop: 52 },
+  container: { flex: 1, backgroundColor: "#070709", padding: 16, paddingTop: 52 },
 
   back: { flexDirection: "row", alignItems: "center", marginBottom: 16 },
-  backText: { color: "#238636", fontSize: 15, fontWeight: "600" },
+  backText: { color: "#FF416C", fontSize: 15, fontWeight: "300" },
 
-  matchHeader: { alignItems: "center", marginBottom: 20, gap: 8 },
-  matchIconContainer: { width: 56, height: 56, borderRadius: 28, backgroundColor: "#F0FFF4", justifyContent: "center", alignItems: "center", borderWidth: 1, borderColor: "#51CF66" },
-  title: { fontSize: 22, fontWeight: "800", color: "#0D1117", letterSpacing: -0.5 },
-  scoreBadge: { backgroundColor: "#F0FFF4", borderRadius: 20, paddingHorizontal: 14, paddingVertical: 5, borderWidth: 1, borderColor: "#51CF66" },
-  scoreText: { color: "#238636", fontSize: 13, fontWeight: "700" },
+  matchHeader: { alignItems: "center", marginBottom: 24, gap: 10 },
+  matchIconContainer: { width: 60, height: 60, borderRadius: 20, justifyContent: "center", alignItems: "center" },
+  title: { fontSize: 24, fontWeight: "200", color: "#E0E0E0", letterSpacing: 1 },
+  scoreBadge: { backgroundColor: "rgba(255,65,108,0.1)", borderRadius: 999, paddingHorizontal: 16, paddingVertical: 6, borderWidth: 1, borderColor: "rgba(255,65,108,0.2)" },
+  scoreText: { color: "#FF416C", fontSize: 13, fontWeight: "300" },
 
   photosRow: { flexDirection: "row", alignItems: "center", marginBottom: 16 },
   photoCard: { flex: 1, alignItems: "center" },
-  photo: { width: "100%", height: 130, borderRadius: 10, marginVertical: 8 },
-  noPhoto: { width: "100%", height: 130, borderRadius: 10, backgroundColor: "#fff", justifyContent: "center", alignItems: "center", marginVertical: 8, borderWidth: 1, borderColor: "#E2E8F0" },
-  photoLabel: { fontSize: 12, color: "#0D1117", textAlign: "center", fontWeight: "700" },
+  photo: { width: "100%", height: 130, borderRadius: 12, marginVertical: 8 },
+  noPhoto: { width: "100%", height: 130, borderRadius: 12, backgroundColor: "rgba(255,255,255,0.02)", justifyContent: "center", alignItems: "center", marginVertical: 8, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
+  photoLabel: { fontSize: 12, color: "#E0E0E0", textAlign: "center", fontWeight: "300" },
   matchIcon: { paddingHorizontal: 8 },
 
   badge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  badgeLost: { backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FF6B6B" },
-  badgeFound: { backgroundColor: "#F0FFF4", borderWidth: 1, borderColor: "#51CF66" },
-  badgeText: { fontSize: 10, fontWeight: "700" },
-  badgeTextLost: { color: "#FF6B6B" },
-  badgeTextFound: { color: "#2F9E44" },
+  badgeLost: { backgroundColor: "rgba(255,65,108,0.15)", borderWidth: 1, borderColor: "rgba(255,65,108,0.3)" },
+  badgeFound: { backgroundColor: "rgba(0,255,128,0.1)", borderWidth: 1, borderColor: "rgba(0,255,128,0.2)" },
+  badgeText: { fontSize: 10, fontWeight: "300", letterSpacing: 1 },
+  badgeTextLost: { color: "#FF416C" },
+  badgeTextFound: { color: "#00FF80" },
 
-  card: { backgroundColor: "#fff", borderRadius: 12, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: "#E2E8F0" },
-  sectionTitle: { fontSize: 15, fontWeight: "700", color: "#0D1117", marginBottom: 12 },
+  card: { backgroundColor: "rgba(255,255,255,0.02)", borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
+  sectionTitle: { fontSize: 15, fontWeight: "200", color: "#E0E0E0", marginBottom: 14, letterSpacing: 0.5 },
   row: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 10 },
-  label: { fontSize: 13, color: "#8B949E", fontWeight: "600", flex: 1 },
-  value: { fontSize: 13, color: "#0D1117", flex: 2, textAlign: "right" },
-  link: { color: "#238636", fontWeight: "600" },
-  divider: { height: 1, backgroundColor: "#F6F8FA" },
+  label: { fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: "300", flex: 1 },
+  value: { fontSize: 13, color: "#E0E0E0", flex: 2, textAlign: "right", fontWeight: "300" },
+  link: { color: "#FF416C" },
+  divider: { height: 1, backgroundColor: "rgba(255,255,255,0.03)" },
 });

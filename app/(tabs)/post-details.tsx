@@ -6,7 +6,8 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { useLocalSearchParams, router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { ArrowLeft, MapPin, ImageOff } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function PostDetailsScreen() {
   const { postId } = useLocalSearchParams();
@@ -22,12 +23,12 @@ export default function PostDetailsScreen() {
     fetchPost();
   }, [postId]);
 
-  if (loading) return <ActivityIndicator color="#238636" style={{ flex: 1, marginTop: 100 }} />;
+  if (loading) return <ActivityIndicator color="#FF416C" style={{ flex: 1, marginTop: 100, backgroundColor: "#070709" }} />;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
       <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-        <Ionicons name="arrow-back" size={16} color="#238636" />
+        <ArrowLeft size={16} color="#FF416C" strokeWidth={1.5} />
         <Text style={styles.backText}> Back</Text>
       </TouchableOpacity>
 
@@ -35,7 +36,7 @@ export default function PostDetailsScreen() {
         <Image source={{ uri: post.imageUrl }} style={styles.image} />
       ) : (
         <View style={styles.noImage}>
-          <Ionicons name="image-outline" size={40} color="#CBD5E1" />
+          <ImageOff size={40} color="rgba(255,255,255,0.1)" strokeWidth={1} />
           <Text style={styles.noImageText}>No Photo</Text>
         </View>
       )}
@@ -56,17 +57,19 @@ export default function PostDetailsScreen() {
 
         <Text style={styles.title}>{post?.title}</Text>
         <View style={styles.divider} />
-
         <View style={styles.row}><Text style={styles.label}>Category</Text><Text style={styles.value}>{post?.category || "Others"}</Text></View>
         <View style={styles.divider} />
         <View style={styles.row}><Text style={styles.label}>Description</Text><Text style={styles.value}>{post?.description}</Text></View>
         <View style={styles.divider} />
-        <View style={styles.row}><Text style={styles.label}>Location</Text><Text style={styles.value}>{post?.location}</Text></View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Location</Text>
+          <Text style={styles.value}>{post?.location}</Text>
+        </View>
         <View style={styles.divider} />
         <View style={styles.row}>
           <Text style={styles.label}>Posted by</Text>
           <TouchableOpacity onPress={() => router.push({ pathname: "/(tabs)/public-profile", params: { userId: post?.userId } })}>
-            <Text style={[styles.value, styles.link]}>{post?.userName}</Text>
+            <Text style={styles.link}>{post?.userName}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.divider} />
@@ -77,36 +80,37 @@ export default function PostDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F6F8FA", padding: 16, paddingTop: 52 },
+  container: { flex: 1, backgroundColor: "#070709", padding: 16, paddingTop: 52 },
 
   back: { flexDirection: "row", alignItems: "center", marginBottom: 16 },
-  backText: { color: "#238636", fontSize: 15, fontWeight: "600" },
+  backText: { color: "#FF416C", fontSize: 15, fontWeight: "300" },
 
-  image: { width: "100%", height: 240, borderRadius: 12, marginBottom: 16 },
-  noImage: { width: "100%", height: 180, borderRadius: 12, backgroundColor: "#fff", justifyContent: "center", alignItems: "center", marginBottom: 16, borderWidth: 1, borderColor: "#E2E8F0", gap: 8 },
-  noImageText: { color: "#8B949E", fontSize: 13 },
+  image: { width: "100%", height: 240, borderRadius: 16, marginBottom: 16 },
+  noImage: { width: "100%", height: 180, borderRadius: 16, backgroundColor: "rgba(255,255,255,0.02)", justifyContent: "center", alignItems: "center", marginBottom: 16, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)", gap: 8 },
+  noImageText: { color: "rgba(255,255,255,0.3)", fontSize: 13, fontWeight: "300" },
 
-  card: { backgroundColor: "#fff", borderRadius: 12, padding: 16, borderWidth: 1, borderColor: "#E2E8F0" },
+  card: { backgroundColor: "rgba(255,255,255,0.02)", borderRadius: 16, padding: 16, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
   cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
 
   badge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  badgeLost: { backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FF6B6B" },
-  badgeFound: { backgroundColor: "#F0FFF4", borderWidth: 1, borderColor: "#51CF66" },
-  badgeText: { fontSize: 11, fontWeight: "700" },
-  badgeTextLost: { color: "#FF6B6B" },
-  badgeTextFound: { color: "#2F9E44" },
+  badgeLost: { backgroundColor: "rgba(255,65,108,0.15)", borderWidth: 1, borderColor: "rgba(255,65,108,0.3)" },
+  badgeFound: { backgroundColor: "rgba(0,255,128,0.1)", borderWidth: 1, borderColor: "rgba(0,255,128,0.2)" },
+  badgeText: { fontSize: 10, fontWeight: "300", letterSpacing: 1 },
+  badgeTextLost: { color: "#FF416C" },
+  badgeTextFound: { color: "#00FF80" },
 
   statusBadge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  statusMatched: { backgroundColor: "#F0FFF4", borderWidth: 1, borderColor: "#51CF66" },
-  statusUnmatched: { backgroundColor: "#F6F8FA", borderWidth: 1, borderColor: "#E2E8F0" },
-  statusText: { fontSize: 11, fontWeight: "700" },
-  statusTextMatched: { color: "#238636" },
-  statusTextUnmatched: { color: "#8B949E" },
+  statusMatched: { backgroundColor: "rgba(255,65,108,0.1)", borderWidth: 1, borderColor: "rgba(255,65,108,0.2)" },
+  statusUnmatched: { backgroundColor: "rgba(255,255,255,0.03)", borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
+  statusText: { fontSize: 10, fontWeight: "300" },
+  statusTextMatched: { color: "#FF416C" },
+  statusTextUnmatched: { color: "rgba(255,255,255,0.4)" },
 
-  title: { fontSize: 20, fontWeight: "800", color: "#0D1117", marginBottom: 12, letterSpacing: -0.5 },
-  row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 10 },
-  label: { fontSize: 13, color: "#8B949E", fontWeight: "600", flex: 1 },
-  value: { fontSize: 13, color: "#0D1117", flex: 2, textAlign: "right" },
-  link: { color: "#238636", fontWeight: "600" },
-  divider: { height: 1, backgroundColor: "#F6F8FA" },
+  title: { fontSize: 22, fontWeight: "200", color: "#E0E0E0", marginBottom: 16, letterSpacing: 0.5 },
+  row: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", paddingVertical: 10 },
+  locationRow: { flexDirection: "row", alignItems: "center", flex: 2, justifyContent: "flex-end", flexWrap: "wrap" },
+  label: { fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: "300", flex: 1 },
+  value: { fontSize: 13, color: "#E0E0E0", flex: 2, textAlign: "right", fontWeight: "300", flexWrap: "wrap" },
+  link: { fontSize: 13, color: "#FF416C", fontWeight: "300" },
+  divider: { height: 1, backgroundColor: "rgba(255,255,255,0.03)" },
 });

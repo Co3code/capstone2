@@ -65,7 +65,7 @@ class MatchResult(BaseModel):
 
 @app.get("/")
 def root():
-    return {"message": "AIFoundIt Matching API is running!"}
+    return {"message": "AIFoundIT Matching API is running!"}
 
 @app.post("/match", response_model=list[MatchResult])
 def match_items(request: MatchRequest):

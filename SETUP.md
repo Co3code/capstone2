@@ -89,4 +89,4 @@ Before testing, open this in browser to wake up the server:
 ```
 https://capstone2-zgpz.onrender.com
 ```
-Wait for: `{"message": "AIFoundIt Matching API is running!"}`
+Wait for: `{"message": "AIFoundIT Matching API is running!"}`

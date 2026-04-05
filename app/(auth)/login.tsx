@@ -6,7 +6,8 @@ import {
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Eye, EyeOff, Search } from "lucide-react-native";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -35,24 +36,24 @@ export default function LoginScreen() {
 
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <View style={styles.logoBadge}>
-            <Ionicons name="scan" size={30} color="#238636" />
-          </View>
+          <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.logoBadge} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+            <Search size={26} color="#fff" strokeWidth={1.5} />
+          </LinearGradient>
           <Text style={styles.appName}>AIFoundIT</Text>
           <Text style={styles.appTagline}>Lost & Found, Powered by AI</Text>
         </View>
 
         {/* Card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Sign in</Text>
-          <Text style={styles.cardSubtitle}>to continue to AIFoundIT</Text>
+          <Text style={styles.cardTitle}>Welcome back</Text>
+          <Text style={styles.cardSubtitle}>Sign in to continue</Text>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email address</Text>
             <TextInput
               style={[styles.input, emailFocused && styles.inputFocused]}
               placeholder="name@example.com"
-              placeholderTextColor="#484F58"
+              placeholderTextColor="rgba(255,255,255,0.2)"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -73,7 +74,7 @@ export default function LoginScreen() {
               <TextInput
                 style={styles.inputInner}
                 placeholder="••••••••"
-                placeholderTextColor="#484F58"
+                placeholderTextColor="rgba(255,255,255,0.2)"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
@@ -81,13 +82,18 @@ export default function LoginScreen() {
                 onBlur={() => setPasswordFocused(false)}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={18} color="#484F58" />
+                {showPassword
+                  ? <EyeOff size={18} color="rgba(255,255,255,0.4)" strokeWidth={1.5} />
+                  : <Eye size={18} color="rgba(255,255,255,0.4)" strokeWidth={1.5} />
+                }
               </TouchableOpacity>
             </View>
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading} activeOpacity={0.85}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign in</Text>}
+          <TouchableOpacity onPress={handleLogin} disabled={loading} activeOpacity={0.85}>
+            <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.button} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign in</Text>}
+            </LinearGradient>
           </TouchableOpacity>
 
           <View style={styles.footer}>
@@ -104,55 +110,45 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0D1117" },
+  container: { flex: 1, backgroundColor: "#070709" },
   scrollContent: { flexGrow: 1, justifyContent: "center", padding: 24 },
 
-  logoContainer: { alignItems: "center", marginBottom: 32 },
-  logoBadge: {
-    width: 64, height: 64, borderRadius: 32,
-    backgroundColor: "#161B22", justifyContent: "center",
-    alignItems: "center", marginBottom: 12,
-    borderWidth: 1, borderColor: "#30363D",
-  },
-  appName: { fontSize: 22, fontWeight: "700", color: "#E6EDF3", letterSpacing: -0.5 },
-  appTagline: { fontSize: 13, color: "#8B949E", marginTop: 4 },
+  logoContainer: { alignItems: "center", marginBottom: 40 },
+  logoBadge: { width: 64, height: 64, borderRadius: 20, justifyContent: "center", alignItems: "center", marginBottom: 16 },
+  appName: { fontSize: 26, fontWeight: "200", color: "#E0E0E0", letterSpacing: 2 },
+  appTagline: { fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 6, fontWeight: "300", letterSpacing: 0.5 },
 
   card: {
-    backgroundColor: "#161B22", borderRadius: 12,
-    borderWidth: 1, borderColor: "#30363D",
-    padding: 24, marginBottom: 16,
+    backgroundColor: "rgba(255,255,255,0.02)", borderRadius: 24,
+    borderWidth: 1, borderColor: "rgba(255,255,255,0.05)", padding: 28,
   },
-  cardTitle: { fontSize: 24, fontWeight: "700", color: "#E6EDF3", marginBottom: 4 },
-  cardSubtitle: { fontSize: 14, color: "#8B949E", marginBottom: 24 },
+  cardTitle: { fontSize: 28, fontWeight: "200", color: "#E0E0E0", marginBottom: 6, letterSpacing: 0.5 },
+  cardSubtitle: { fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 32, fontWeight: "300" },
 
-  inputGroup: { marginBottom: 16 },
-  labelRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
-  label: { fontSize: 14, fontWeight: "600", color: "#E6EDF3", marginBottom: 8 },
-  forgotText: { fontSize: 13, color: "#58A6FF" },
+  inputGroup: { marginBottom: 20 },
+  labelRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 },
+  label: { fontSize: 13, fontWeight: "300", color: "rgba(255,255,255,0.6)", marginBottom: 10, letterSpacing: 0.5 },
+  forgotText: { fontSize: 13, color: "#FF416C", fontWeight: "300" },
 
   input: {
-    backgroundColor: "#0D1117", borderWidth: 1,
-    borderColor: "#30363D", borderRadius: 8,
-    paddingHorizontal: 14, paddingVertical: 12,
-    fontSize: 15, color: "#E6EDF3",
+    backgroundColor: "rgba(255,255,255,0.03)", borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)", borderRadius: 12,
+    paddingHorizontal: 16, paddingVertical: 14,
+    fontSize: 15, color: "#E0E0E0", fontWeight: "300",
   },
   inputRow: {
     flexDirection: "row", alignItems: "center",
-    backgroundColor: "#0D1117", borderWidth: 1,
-    borderColor: "#30363D", borderRadius: 8,
-    paddingHorizontal: 14, paddingVertical: 12,
+    backgroundColor: "rgba(255,255,255,0.03)", borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)", borderRadius: 12,
+    paddingHorizontal: 16, paddingVertical: 14,
   },
-  inputInner: { flex: 1, fontSize: 15, color: "#E6EDF3" },
-  inputFocused: { borderColor: "#58A6FF" },
+  inputInner: { flex: 1, fontSize: 15, color: "#E0E0E0", fontWeight: "300" },
+  inputFocused: { borderColor: "#FF416C" },
 
-  button: {
-    backgroundColor: "#238636", borderRadius: 8,
-    paddingVertical: 14, alignItems: "center",
-    marginTop: 8, borderWidth: 1, borderColor: "#2EA043",
-  },
-  buttonText: { color: "#fff", fontSize: 15, fontWeight: "700" },
+  button: { borderRadius: 999, paddingVertical: 16, alignItems: "center", marginTop: 8 },
+  buttonText: { color: "#fff", fontSize: 15, fontWeight: "300", letterSpacing: 1 },
 
-  footer: { flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 20 },
-  footerText: { fontSize: 14, color: "#8B949E" },
-  footerLink: { fontSize: 14, color: "#58A6FF", fontWeight: "600" },
+  footer: { flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 24 },
+  footerText: { fontSize: 14, color: "rgba(255,255,255,0.4)", fontWeight: "300" },
+  footerLink: { fontSize: 14, color: "#FF416C", fontWeight: "300" },
 });

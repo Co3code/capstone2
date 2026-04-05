@@ -7,7 +7,8 @@ import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc, getDoc, 
 import { signOut } from "firebase/auth";
 import { db, auth } from "@/services/firebase";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Phone, Pencil, LogOut, Trash2, FileText } from "lucide-react-native";
 
 type Post = {
   id: string;
@@ -67,47 +68,44 @@ export default function ProfileScreen() {
     setModalVisible(false);
   };
 
-  const ListHeader = () => (
+  const renderHeader = () => (
     <View>
-      {/* Profile Card */}
       <View style={styles.profileCard}>
-        <View style={styles.avatar}>
+        <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.avatar} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
           <Text style={styles.avatarText}>{user?.displayName?.charAt(0).toUpperCase() || "U"}</Text>
-        </View>
+        </LinearGradient>
         <View style={styles.userInfo}>
           <Text style={styles.name}>{user?.displayName || "User"}</Text>
           <Text style={styles.email}>{user?.email}</Text>
           <View style={styles.phoneRow}>
-            <Ionicons name="call-outline" size={12} color="#8B949E" />
+            <Phone size={12} color="rgba(255,255,255,0.3)" strokeWidth={1.5} />
             <Text style={styles.phone}> {phone || "No phone added"}</Text>
           </View>
         </View>
       </View>
 
-      {/* Stats */}
       <View style={styles.statsRow}>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>{posts.length}</Text>
           <Text style={styles.statLabel}>Total</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={[styles.statNumber, { color: "#238636" }]}>{matched}</Text>
+          <Text style={[styles.statNumber, { color: "#FF416C" }]}>{matched}</Text>
           <Text style={styles.statLabel}>Matched</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={[styles.statNumber, { color: "#FF6B6B" }]}>{unmatched}</Text>
+          <Text style={[styles.statNumber, { color: "rgba(255,255,255,0.4)" }]}>{unmatched}</Text>
           <Text style={styles.statLabel}>Unmatched</Text>
         </View>
       </View>
 
-      {/* Action Buttons */}
       <View style={styles.actionRow}>
-        <TouchableOpacity style={styles.editBtn} onPress={() => { setEditPhone(phone); setModalVisible(true); }}>
-          <Ionicons name="pencil-outline" size={14} color="#0D1117" />
+        <TouchableOpacity style={styles.editBtn} onPress={() => { setEditPhone(phone); setModalVisible(true); }} activeOpacity={0.8}>
+          <Pencil size={14} color="rgba(255,255,255,0.6)" strokeWidth={1.5} />
           <Text style={styles.editBtnText}> Edit Contact</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={14} color="#FF6B6B" />
+        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} activeOpacity={0.8}>
+          <LogOut size={14} color="#FF416C" strokeWidth={1.5} />
           <Text style={styles.logoutText}> Logout</Text>
         </TouchableOpacity>
       </View>
@@ -119,21 +117,21 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       {loading ? (
-        <ActivityIndicator color="#238636" style={{ marginTop: 20 }} />
+        <ActivityIndicator color="#FF416C" style={{ marginTop: 20 }} />
       ) : (
         <FlatList
           data={posts}
           keyExtractor={(item) => item.id}
-          ListHeaderComponent={ListHeader}
+          ListHeaderComponent={renderHeader}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Ionicons name="document-outline" size={48} color="#E2E8F0" />
-              <Text style={styles.empty}>{"You haven't"} posted anything yet.</Text>
+              <FileText size={48} color="rgba(255,255,255,0.1)" strokeWidth={1} />
+              <Text style={styles.empty}>You {"haven't"} posted anything yet.</Text>
             </View>
           }
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.card} onPress={() => router.push({ pathname: "/(tabs)/post-details", params: { postId: item.id } })}>
+            <TouchableOpacity style={styles.card} onPress={() => router.push({ pathname: "/(tabs)/post-details", params: { postId: item.id } })} activeOpacity={0.8}>
               <View style={styles.cardRow}>
                 <View style={[styles.badge, item.type === "lost" ? styles.badgeLost : styles.badgeFound]}>
                   <Text style={[styles.badgeText, item.type === "lost" ? styles.badgeTextLost : styles.badgeTextFound]}>{item.type.toUpperCase()}</Text>
@@ -148,14 +146,14 @@ export default function ProfileScreen() {
               <View style={styles.divider} />
               <View style={styles.detailRow}><Text style={styles.detailLabel}>Description</Text><Text style={styles.detailValue} numberOfLines={2}>{item.description}</Text></View>
               <View style={styles.divider} />
-              <View style={styles.detailRow}><Text style={styles.detailLabel}>Location</Text><Text style={styles.detailValue}>{item.location}</Text></View>
+              <View style={styles.detailRow}><Text style={styles.detailLabel}>Location</Text><Text style={styles.detailValue} numberOfLines={2}>{item.location}</Text></View>
               <View style={styles.divider} />
               <View style={styles.detailRow}><Text style={styles.detailLabel}>Category</Text><Text style={styles.detailValue}>{item.category || "Others"}</Text></View>
               <View style={styles.divider} />
               <View style={styles.detailRow}><Text style={styles.detailLabel}>Date</Text><Text style={styles.detailValue}>{new Date(item.createdAt).toLocaleDateString()}</Text></View>
               {item.status !== "matched" && (
-                <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDeletePost(item.id)}>
-                  <Ionicons name="trash-outline" size={13} color="#FF6B6B" />
+                <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDeletePost(item.id)} activeOpacity={0.8}>
+                  <Trash2 size={13} color="#FF416C" strokeWidth={1.5} />
                   <Text style={styles.deleteBtnText}> Delete</Text>
                 </TouchableOpacity>
               )}
@@ -171,13 +169,15 @@ export default function ProfileScreen() {
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
-              placeholderTextColor="#8B949E"
+              placeholderTextColor="rgba(255,255,255,0.2)"
               value={editPhone}
               onChangeText={setEditPhone}
               keyboardType="phone-pad"
             />
-            <TouchableOpacity style={styles.button} onPress={handleSavePhone}>
-              <Text style={styles.buttonText}>Save</Text>
+            <TouchableOpacity onPress={handleSavePhone} activeOpacity={0.85}>
+              <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.button} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                <Text style={styles.buttonText}>Save</Text>
+              </LinearGradient>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={styles.cancelText}>Cancel</Text>
@@ -190,58 +190,58 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F6F8FA", padding: 16, paddingTop: 52 },
+  container: { flex: 1, backgroundColor: "#070709", padding: 16, paddingTop: 52 },
 
-  profileCard: { backgroundColor: "#fff", borderRadius: 12, padding: 16, flexDirection: "row", alignItems: "center", marginBottom: 12, borderWidth: 1, borderColor: "#E2E8F0" },
-  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: "#0D1117", justifyContent: "center", alignItems: "center", marginRight: 14 },
-  avatarText: { color: "#fff", fontSize: 22, fontWeight: "800" },
+  profileCard: { backgroundColor: "rgba(255,255,255,0.02)", borderRadius: 16, padding: 16, flexDirection: "row", alignItems: "center", marginBottom: 12, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
+  avatar: { width: 56, height: 56, borderRadius: 28, justifyContent: "center", alignItems: "center", marginRight: 14 },
+  avatarText: { color: "#fff", fontSize: 22, fontWeight: "200" },
   userInfo: { flex: 1 },
-  name: { fontSize: 17, fontWeight: "700", color: "#0D1117" },
-  email: { fontSize: 12, color: "#8B949E", marginTop: 2 },
-  phoneRow: { flexDirection: "row", alignItems: "center", marginTop: 2 },
-  phone: { fontSize: 12, color: "#8B949E" },
+  name: { fontSize: 17, fontWeight: "200", color: "#E0E0E0", letterSpacing: 0.5 },
+  email: { fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2, fontWeight: "300" },
+  phoneRow: { flexDirection: "row", alignItems: "center", marginTop: 4 },
+  phone: { fontSize: 12, color: "rgba(255,255,255,0.3)", fontWeight: "300" },
 
   statsRow: { flexDirection: "row", gap: 8, marginBottom: 12 },
-  statCard: { flex: 1, backgroundColor: "#fff", borderRadius: 10, padding: 12, alignItems: "center", borderWidth: 1, borderColor: "#E2E8F0" },
-  statNumber: { fontSize: 20, fontWeight: "800", color: "#0D1117" },
-  statLabel: { fontSize: 11, color: "#8B949E", marginTop: 2 },
+  statCard: { flex: 1, backgroundColor: "rgba(255,255,255,0.02)", borderRadius: 12, padding: 12, alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
+  statNumber: { fontSize: 20, fontWeight: "200", color: "#E0E0E0" },
+  statLabel: { fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2, fontWeight: "300" },
 
   actionRow: { flexDirection: "row", gap: 8, marginBottom: 20 },
-  editBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: "#fff", padding: 10, borderRadius: 8, borderWidth: 1, borderColor: "#E2E8F0" },
-  editBtnText: { color: "#0D1117", fontWeight: "600", fontSize: 13 },
-  logoutBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: "#FFF0F0", padding: 10, borderRadius: 8, borderWidth: 1, borderColor: "#FFCDD2" },
-  logoutText: { color: "#FF6B6B", fontWeight: "600", fontSize: 13 },
+  editBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(255,255,255,0.03)", padding: 10, borderRadius: 999, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
+  editBtnText: { color: "rgba(255,255,255,0.6)", fontWeight: "300", fontSize: 13 },
+  logoutBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(255,65,108,0.05)", padding: 10, borderRadius: 999, borderWidth: 1, borderColor: "rgba(255,65,108,0.15)" },
+  logoutText: { color: "#FF416C", fontWeight: "300", fontSize: 13 },
 
-  sectionTitle: { fontSize: 16, fontWeight: "700", color: "#0D1117", marginBottom: 12 },
+  sectionTitle: { fontSize: 16, fontWeight: "200", color: "#E0E0E0", marginBottom: 12, letterSpacing: 0.5 },
   emptyContainer: { alignItems: "center", marginTop: 40, gap: 8 },
-  empty: { textAlign: "center", color: "#8B949E", fontSize: 14 },
+  empty: { textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: 14, fontWeight: "300" },
 
-  card: { backgroundColor: "#fff", borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: "#E2E8F0" },
+  card: { backgroundColor: "rgba(255,255,255,0.02)", borderRadius: 16, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
   cardRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
   badge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  badgeLost: { backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FF6B6B" },
-  badgeFound: { backgroundColor: "#F0FFF4", borderWidth: 1, borderColor: "#51CF66" },
-  badgeText: { fontSize: 10, fontWeight: "700" },
-  badgeTextLost: { color: "#FF6B6B" },
-  badgeTextFound: { color: "#2F9E44" },
+  badgeLost: { backgroundColor: "rgba(255,65,108,0.15)", borderWidth: 1, borderColor: "rgba(255,65,108,0.3)" },
+  badgeFound: { backgroundColor: "rgba(0,255,128,0.1)", borderWidth: 1, borderColor: "rgba(0,255,128,0.2)" },
+  badgeText: { fontSize: 10, fontWeight: "300", letterSpacing: 1 },
+  badgeTextLost: { color: "#FF416C" },
+  badgeTextFound: { color: "#00FF80" },
   statusBadge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  statusMatched: { backgroundColor: "#F0FFF4", borderWidth: 1, borderColor: "#51CF66" },
-  statusUnmatched: { backgroundColor: "#F6F8FA", borderWidth: 1, borderColor: "#E2E8F0" },
-  statusText: { fontSize: 10, fontWeight: "700" },
-  statusTextMatched: { color: "#238636" },
-  statusTextUnmatched: { color: "#8B949E" },
+  statusMatched: { backgroundColor: "rgba(255,65,108,0.1)", borderWidth: 1, borderColor: "rgba(255,65,108,0.2)" },
+  statusUnmatched: { backgroundColor: "rgba(255,255,255,0.03)", borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
+  statusText: { fontSize: 10, fontWeight: "300" },
+  statusTextMatched: { color: "#FF416C" },
+  statusTextUnmatched: { color: "rgba(255,255,255,0.4)" },
   detailRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 6 },
-  detailLabel: { fontSize: 12, color: "#8B949E", fontWeight: "600", flex: 1 },
-  detailValue: { fontSize: 12, color: "#0D1117", flex: 2, textAlign: "right" },
-  divider: { height: 1, backgroundColor: "#F6F8FA" },
-  deleteBtn: { flexDirection: "row", alignSelf: "flex-end", alignItems: "center", backgroundColor: "#FFF0F0", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: "#FFCDD2", marginTop: 10 },
-  deleteBtnText: { color: "#FF6B6B", fontSize: 12, fontWeight: "700" },
+  detailLabel: { fontSize: 12, color: "rgba(255,255,255,0.4)", fontWeight: "300", flex: 1 },
+  detailValue: { fontSize: 12, color: "#E0E0E0", flex: 2, textAlign: "right", fontWeight: "300" },
+  divider: { height: 1, backgroundColor: "rgba(255,255,255,0.03)" },
+  deleteBtn: { flexDirection: "row", alignSelf: "flex-end", alignItems: "center", backgroundColor: "rgba(255,65,108,0.05)", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: "rgba(255,65,108,0.15)", marginTop: 10 },
+  deleteBtnText: { color: "#FF416C", fontSize: 12, fontWeight: "300" },
 
-  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "center", padding: 24 },
-  modalCard: { backgroundColor: "#fff", borderRadius: 16, padding: 24 },
-  modalTitle: { fontSize: 18, fontWeight: "700", color: "#0D1117", marginBottom: 16 },
-  input: { backgroundColor: "#F6F8FA", borderWidth: 1, borderColor: "#E2E8F0", borderRadius: 8, padding: 14, marginBottom: 12, fontSize: 15, color: "#0D1117" },
-  button: { backgroundColor: "#238636", padding: 14, borderRadius: 8, alignItems: "center", marginBottom: 8, borderWidth: 1, borderColor: "#2EA043" },
-  buttonText: { color: "#fff", fontWeight: "700", fontSize: 15 },
-  cancelText: { textAlign: "center", color: "#8B949E", marginTop: 4, fontSize: 14 },
+  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.8)", justifyContent: "center", padding: 24 },
+  modalCard: { backgroundColor: "#0D0D0F", borderRadius: 24, padding: 24, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
+  modalTitle: { fontSize: 18, fontWeight: "200", color: "#E0E0E0", marginBottom: 20, letterSpacing: 0.5 },
+  input: { backgroundColor: "rgba(255,255,255,0.03)", borderWidth: 1, borderColor: "rgba(255,255,255,0.05)", borderRadius: 12, padding: 14, marginBottom: 16, fontSize: 15, color: "#E0E0E0", fontWeight: "300" },
+  button: { borderRadius: 999, paddingVertical: 14, alignItems: "center", marginBottom: 12 },
+  buttonText: { color: "#fff", fontWeight: "300", fontSize: 15, letterSpacing: 1 },
+  cancelText: { textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: 14, fontWeight: "300" },
 });

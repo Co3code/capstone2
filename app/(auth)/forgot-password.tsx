@@ -6,7 +6,8 @@ import {
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Search, ArrowLeft } from "lucide-react-native";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -14,11 +15,11 @@ export default function ForgotPasswordScreen() {
   const [emailFocused, setEmailFocused] = useState(false);
 
   const handleReset = async () => {
-    if (!email) return Alert.alert("Error", "Please enter your email address you used to register");
+    if (!email) return Alert.alert("Error", "Please enter your email");
     setLoading(true);
     try {
       await sendPasswordResetEmail(auth, email);
-      Alert.alert("Success", "  We’ve sent a password reset email. Please check your inbox or spam folder.", [
+      Alert.alert("Success", "Password reset email sent! Check your inbox.", [
         { text: "OK", onPress: () => router.back() },
       ]);
     } catch {
@@ -34,9 +35,9 @@ export default function ForgotPasswordScreen() {
 
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <View style={styles.logoBadge}>
-            <Ionicons name="search" size={30} color="#238636" />
-          </View>
+          <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.logoBadge} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+            <Search size={26} color="#fff" strokeWidth={1.5} />
+          </LinearGradient>
           <Text style={styles.appName}>AIFoundIT</Text>
           <Text style={styles.appTagline}>Lost & Found, Powered by AI</Text>
         </View>
@@ -51,7 +52,7 @@ export default function ForgotPasswordScreen() {
             <TextInput
               style={[styles.input, emailFocused && styles.inputFocused]}
               placeholder="name@example.com"
-              placeholderTextColor="#484F58"
+              placeholderTextColor="rgba(255,255,255,0.2)"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -61,15 +62,16 @@ export default function ForgotPasswordScreen() {
             />
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleReset} disabled={loading} activeOpacity={0.85}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Send reset email</Text>}
+          <TouchableOpacity onPress={handleReset} disabled={loading} activeOpacity={0.85}>
+            <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.button} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Send reset email</Text>}
+            </LinearGradient>
           </TouchableOpacity>
 
-          <View style={styles.footer}>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.footerLink}>Back to sign in</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.footer} onPress={() => router.back()}>
+            <ArrowLeft size={14} color="#FF416C" strokeWidth={1.5} />
+            <Text style={styles.footerLink}> Back to sign in</Text>
+          </TouchableOpacity>
         </View>
 
       </ScrollView>
@@ -78,45 +80,35 @@ export default function ForgotPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0D1117" },
+  container: { flex: 1, backgroundColor: "#070709" },
   scrollContent: { flexGrow: 1, justifyContent: "center", padding: 24 },
 
-  logoContainer: { alignItems: "center", marginBottom: 32 },
-  logoBadge: {
-    width: 64, height: 64, borderRadius: 32,
-    backgroundColor: "#161B22", justifyContent: "center",
-    alignItems: "center", marginBottom: 12,
-    borderWidth: 1, borderColor: "#30363D",
-  },
-  appName: { fontSize: 22, fontWeight: "700", color: "#E6EDF3", letterSpacing: -0.5 },
-  appTagline: { fontSize: 13, color: "#8B949E", marginTop: 4 },
+  logoContainer: { alignItems: "center", marginBottom: 40 },
+  logoBadge: { width: 64, height: 64, borderRadius: 20, justifyContent: "center", alignItems: "center", marginBottom: 16 },
+  appName: { fontSize: 26, fontWeight: "200", color: "#E0E0E0", letterSpacing: 2 },
+  appTagline: { fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 6, fontWeight: "300", letterSpacing: 0.5 },
 
   card: {
-    backgroundColor: "#161B22", borderRadius: 12,
-    borderWidth: 1, borderColor: "#30363D",
-    padding: 24, marginBottom: 16,
+    backgroundColor: "rgba(255,255,255,0.02)", borderRadius: 24,
+    borderWidth: 1, borderColor: "rgba(255,255,255,0.05)", padding: 28,
   },
-  cardTitle: { fontSize: 24, fontWeight: "700", color: "#E6EDF3", marginBottom: 4 },
-  cardSubtitle: { fontSize: 14, color: "#8B949E", marginBottom: 24 },
+  cardTitle: { fontSize: 28, fontWeight: "200", color: "#E0E0E0", marginBottom: 6, letterSpacing: 0.5 },
+  cardSubtitle: { fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 32, fontWeight: "300" },
 
-  inputGroup: { marginBottom: 16 },
-  label: { fontSize: 14, fontWeight: "600", color: "#E6EDF3", marginBottom: 8 },
+  inputGroup: { marginBottom: 20 },
+  label: { fontSize: 13, fontWeight: "300", color: "rgba(255,255,255,0.6)", marginBottom: 10, letterSpacing: 0.5 },
 
   input: {
-    backgroundColor: "#0D1117", borderWidth: 1,
-    borderColor: "#30363D", borderRadius: 8,
-    paddingHorizontal: 14, paddingVertical: 12,
-    fontSize: 15, color: "#E6EDF3",
+    backgroundColor: "rgba(255,255,255,0.03)", borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)", borderRadius: 12,
+    paddingHorizontal: 16, paddingVertical: 14,
+    fontSize: 15, color: "#E0E0E0", fontWeight: "300",
   },
-  inputFocused: { borderColor: "#58A6FF" },
+  inputFocused: { borderColor: "#FF416C" },
 
-  button: {
-    backgroundColor: "#238636", borderRadius: 8,
-    paddingVertical: 14, alignItems: "center",
-    marginTop: 8, borderWidth: 1, borderColor: "#2EA043",
-  },
-  buttonText: { color: "#fff", fontSize: 15, fontWeight: "700" },
+  button: { borderRadius: 999, paddingVertical: 16, alignItems: "center", marginTop: 8 },
+  buttonText: { color: "#fff", fontSize: 15, fontWeight: "300", letterSpacing: 1 },
 
-  footer: { alignItems: "center", marginTop: 20 },
-  footerLink: { fontSize: 14, color: "#58A6FF", fontWeight: "600" },
+  footer: { flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 24 },
+  footerLink: { fontSize: 14, color: "#FF416C", fontWeight: "300" },
 });

@@ -9,7 +9,8 @@ import { collection, addDoc, getDocs, query, where, doc, updateDoc } from "fireb
 import { db, auth } from "@/services/firebase";
 import { uploadImage } from "@/services/cloudinary";
 import { matchItems } from "@/services/api";
-import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Camera, Image as ImageIcon, X } from "lucide-react-native";
 
 export default function PostScreen() {
   const [type, setType] = useState<"lost" | "found">("lost");
@@ -20,7 +21,7 @@ export default function PostScreen() {
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const categories = ["Bag", "Wallet", "Phone", "Keys", "ID/Cards", "Clothing", "Electronics", "Others"];
+  const categories = ["Bag", "Wallet", "Phone", "Keys", "ID/Cards", "Clothing",  "Others"];
 
   const processImage = async (uri: string) => {
     const manipulated = await ImageManipulator.manipulateAsync(
@@ -106,7 +107,6 @@ export default function PostScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Post an Item</Text>
         <Text style={styles.headerSubtitle}>Help reunite lost items with their owners</Text>
@@ -115,8 +115,16 @@ export default function PostScreen() {
       {/* Type Toggle */}
       <View style={styles.toggleContainer}>
         {(["lost", "found"] as const).map((t) => (
-          <TouchableOpacity key={t} style={[styles.toggleBtn, type === t && (t === "lost" ? styles.toggleLost : styles.toggleFound)]} onPress={() => setType(t)}>
-            <Text style={[styles.toggleText, type === t && styles.toggleTextActive]}>{t.charAt(0).toUpperCase() + t.slice(1)}</Text>
+          <TouchableOpacity key={t} onPress={() => setType(t)} activeOpacity={0.8} style={{ flex: 1 }}>
+            {type === t ? (
+              <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.toggleActive} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                <Text style={styles.toggleTextActive}>{t.charAt(0).toUpperCase() + t.slice(1)}</Text>
+              </LinearGradient>
+            ) : (
+              <View style={styles.toggleBtn}>
+                <Text style={styles.toggleText}>{t.charAt(0).toUpperCase() + t.slice(1)}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         ))}
       </View>
@@ -124,86 +132,96 @@ export default function PostScreen() {
       {/* Form Card */}
       <View style={styles.card}>
         <Text style={styles.label}>Item Title</Text>
-        <TextInput style={styles.input} placeholder="e.g. Black leather wallet" placeholderTextColor="#8B949E" value={title} onChangeText={setTitle} />
+        <TextInput style={styles.input} placeholder="e.g. Black Leather Wallet" placeholderTextColor="rgba(255,255,255,0.2)" value={title} onChangeText={setTitle} />
 
         <Text style={styles.label}>Category</Text>
         <View style={styles.categoryGrid}>
           {categories.map((cat) => (
-            <TouchableOpacity key={cat} style={[styles.categoryBtn, category === cat && styles.categoryBtnActive]} onPress={() => setCategory(cat)}>
-              <Text style={[styles.categoryText, category === cat && styles.categoryTextActive]}>{cat}</Text>
+            <TouchableOpacity key={cat} onPress={() => setCategory(cat)} activeOpacity={0.8}>
+              {category === cat ? (
+                <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.categoryBtnActive} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                  <Text style={styles.categoryTextActive}>{cat}</Text>
+                </LinearGradient>
+              ) : (
+                <View style={styles.categoryBtn}>
+                  <Text style={styles.categoryText}>{cat}</Text>
+                </View>
+              )}
             </TouchableOpacity>
           ))}
         </View>
 
         <Text style={styles.label}>Description</Text>
-        <TextInput style={[styles.input, styles.textArea]} placeholder="Describe the item in detail..." placeholderTextColor="#8B949E" value={description} onChangeText={setDescription} multiline />
+        <TextInput style={[styles.input, styles.textArea]} placeholder="e.g. Black wallet with ID cards and cash inside. Has a small scratch on the back." placeholderTextColor="rgba(255,255,255,0.2)" value={description} onChangeText={setDescription} multiline />
 
         <Text style={styles.label}>Location</Text>
-        <TextInput style={styles.input} placeholder="Where was it lost/found?" placeholderTextColor="#8B949E" value={location} onChangeText={setLocation} />
+        <TextInput style={styles.input} placeholder="e.g. SM Mall Food Court, 2nd Floor" placeholderTextColor="rgba(255,255,255,0.2)" value={location} onChangeText={setLocation} />
 
         <Text style={styles.label}>Photo</Text>
         {image ? (
           <View style={styles.imageContainer}>
             <Image source={{ uri: image }} style={styles.imagePreview} />
             <TouchableOpacity style={styles.removeImage} onPress={() => setImage(null)}>
-              <Text style={styles.removeImageText}>Remove</Text>
+              <X size={14} color="#FF416C" strokeWidth={1.5} />
+              <Text style={styles.removeImageText}> Remove</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.photoButtons}>
-            <TouchableOpacity style={styles.photoBtn} onPress={takePhoto}>
-              <Ionicons name="camera-outline" size={18} color="#0D1117" />
+            <TouchableOpacity style={styles.photoBtn} onPress={takePhoto} activeOpacity={0.8}>
+              <Camera size={18} color="rgba(255,255,255,0.6)" strokeWidth={1.5} />
               <Text style={styles.photoBtnText}>Camera</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.photoBtn} onPress={pickImage}>
-              <Ionicons name="image-outline" size={18} color="#0D1117" />
+            <TouchableOpacity style={styles.photoBtn} onPress={pickImage} activeOpacity={0.8}>
+              <ImageIcon size={18} color="rgba(255,255,255,0.6)" strokeWidth={1.5} />
               <Text style={styles.photoBtnText}>Gallery</Text>
             </TouchableOpacity>
           </View>
         )}
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading} activeOpacity={0.85}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Submit Post</Text>}
+      <TouchableOpacity onPress={handleSubmit} disabled={loading} activeOpacity={0.85}>
+        <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.button} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Submit Post</Text>}
+        </LinearGradient>
       </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F6F8FA", padding: 16, paddingTop: 52 },
+  container: { flex: 1, backgroundColor: "#070709", padding: 16, paddingTop: 52 },
 
   header: { marginBottom: 20 },
-  headerTitle: { fontSize: 22, fontWeight: "800", color: "#0D1117", letterSpacing: -0.5 },
-  headerSubtitle: { fontSize: 12, color: "#8B949E", marginTop: 2 },
+  headerTitle: { fontSize: 22, fontWeight: "200", color: "#E0E0E0", letterSpacing: 1 },
+  headerSubtitle: { fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2, fontWeight: "300" },
 
-  toggleContainer: { flexDirection: "row", backgroundColor: "#fff", borderRadius: 10, borderWidth: 1, borderColor: "#E2E8F0", padding: 4, marginBottom: 16, gap: 4 },
-  toggleBtn: { flex: 1, padding: 10, borderRadius: 8, alignItems: "center" },
-  toggleLost: { backgroundColor: "#FFF0F0" },
-  toggleFound: { backgroundColor: "#F0FFF4" },
-  toggleText: { fontWeight: "700", color: "#8B949E", fontSize: 14 },
-  toggleTextActive: { color: "#0D1117" },
+  toggleContainer: { flexDirection: "row", backgroundColor: "rgba(255,255,255,0.03)", borderRadius: 999, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)", padding: 4, marginBottom: 16, gap: 4 },
+  toggleBtn: { flex: 1, padding: 10, borderRadius: 999, alignItems: "center" },
+  toggleActive: { flex: 1, padding: 10, borderRadius: 999, alignItems: "center" },
+  toggleText: { fontWeight: "300", color: "rgba(255,255,255,0.4)", fontSize: 14 },
+  toggleTextActive: { fontWeight: "300", color: "#fff", fontSize: 14 },
 
-  card: { backgroundColor: "#fff", borderRadius: 12, padding: 16, borderWidth: 1, borderColor: "#E2E8F0", marginBottom: 16 },
-  label: { fontSize: 13, fontWeight: "600", color: "#0D1117", marginBottom: 8 },
-  input: { backgroundColor: "#F6F8FA", borderWidth: 1, borderColor: "#E2E8F0", borderRadius: 8, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, color: "#0D1117", marginBottom: 16 },
+  card: { backgroundColor: "rgba(255,255,255,0.02)", borderRadius: 16, padding: 16, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)", marginBottom: 16 },
+  label: { fontSize: 13, fontWeight: "300", color: "rgba(255,255,255,0.6)", marginBottom: 10, letterSpacing: 0.5 },
+  input: { backgroundColor: "rgba(255,255,255,0.03)", borderWidth: 1, borderColor: "rgba(255,255,255,0.05)", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, color: "#E0E0E0", marginBottom: 16, fontWeight: "300" },
   textArea: { height: 100, textAlignVertical: "top" },
 
   categoryGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 16 },
-  categoryBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: "#E2E8F0", backgroundColor: "#F6F8FA" },
-  categoryBtnActive: { backgroundColor: "#0D1117", borderColor: "#0D1117" },
-  categoryText: { fontSize: 12, color: "#8B949E", fontWeight: "500" },
-  categoryTextActive: { color: "#fff", fontWeight: "700" },
+  categoryBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)", backgroundColor: "rgba(255,255,255,0.03)" },
+  categoryBtnActive: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 },
+  categoryText: { fontSize: 12, color: "rgba(255,255,255,0.4)", fontWeight: "300" },
+  categoryTextActive: { fontSize: 12, color: "#fff", fontWeight: "300" },
 
   imageContainer: { marginBottom: 16 },
-  imagePreview: { width: "100%", height: 180, borderRadius: 10, marginBottom: 8 },
-  removeImage: { alignSelf: "flex-end", backgroundColor: "#FFF0F0", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: "#FF6B6B" },
-  removeImageText: { color: "#FF6B6B", fontSize: 12, fontWeight: "700" },
+  imagePreview: { width: "100%", height: 180, borderRadius: 12, marginBottom: 8 },
+  removeImage: { flexDirection: "row", alignSelf: "flex-end", alignItems: "center", backgroundColor: "rgba(255,65,108,0.1)", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: "rgba(255,65,108,0.2)" },
+  removeImageText: { color: "#FF416C", fontSize: 12, fontWeight: "300" },
 
   photoButtons: { flexDirection: "row", gap: 12, marginBottom: 4 },
-  photoBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, backgroundColor: "#F6F8FA", borderWidth: 1, borderColor: "#E2E8F0", borderRadius: 8, padding: 12 },
-  photoBtnText: { color: "#0D1117", fontWeight: "600", fontSize: 14 },
+  photoBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, backgroundColor: "rgba(255,255,255,0.03)", borderWidth: 1, borderColor: "rgba(255,255,255,0.05)", borderRadius: 12, padding: 12 },
+  photoBtnText: { color: "rgba(255,255,255,0.6)", fontWeight: "300", fontSize: 14 },
 
-  button: { backgroundColor: "#238636", borderRadius: 8, paddingVertical: 14, alignItems: "center", borderWidth: 1, borderColor: "#2EA043" },
-  buttonText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+  button: { borderRadius: 999, paddingVertical: 16, alignItems: "center" },
+  buttonText: { color: "#fff", fontWeight: "300", fontSize: 15, letterSpacing: 1 },
 });

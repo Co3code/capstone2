@@ -3,7 +3,8 @@ import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity }
 import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
 import { db, auth } from "@/services/firebase";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Bell, CheckCircle, ChevronRight } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 type Notification = {
   id: string;
@@ -40,17 +41,17 @@ export default function NotificationsScreen() {
           <Text style={styles.headerSubtitle}>Your match updates</Text>
         </View>
         {unreadCount > 0 && (
-          <View style={styles.unreadBadge}>
+          <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.unreadBadge} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
             <Text style={styles.unreadBadgeText}>{unreadCount} new</Text>
-          </View>
+          </LinearGradient>
         )}
       </View>
 
       {loading ? (
-        <ActivityIndicator color="#238636" style={{ marginTop: 20 }} />
+        <ActivityIndicator color="#FF416C" style={{ marginTop: 20 }} />
       ) : notifications.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="notifications-outline" size={48} color="#E2E8F0" />
+          <Bell size={48} color="rgba(255,255,255,0.1)" strokeWidth={1} />
           <Text style={styles.emptyTitle}>No notifications yet</Text>
           <Text style={styles.emptyDesc}>You will be notified when a match is found for your item.</Text>
         </View>
@@ -63,10 +64,11 @@ export default function NotificationsScreen() {
             <TouchableOpacity
               style={[styles.card, !item.read && styles.unread]}
               onPress={() => item.matchedPostId && router.push({ pathname: "/(tabs)/match-details", params: { postId: item.matchedPostId, myPostId: item.myPostId, score: item.score } })}
+              activeOpacity={0.8}
             >
               <View style={styles.cardHeader}>
                 <View style={styles.matchLabel}>
-                  <Ionicons name="checkmark-circle" size={12} color="#238636" />
+                  <CheckCircle size={12} color="#FF416C" strokeWidth={1.5} />
                   <Text style={styles.matchLabelText}> Match Found</Text>
                 </View>
                 {item.score && (
@@ -81,7 +83,7 @@ export default function NotificationsScreen() {
                 {item.matchedPostId && (
                   <View style={styles.tapRow}>
                     <Text style={styles.tap}>View match</Text>
-                    <Ionicons name="chevron-forward" size={12} color="#238636" />
+                    <ChevronRight size={12} color="#FF416C" strokeWidth={1.5} />
                   </View>
                 )}
               </View>
@@ -94,28 +96,28 @@ export default function NotificationsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F6F8FA", padding: 16, paddingTop: 52 },
+  container: { flex: 1, backgroundColor: "#070709", padding: 16, paddingTop: 52 },
 
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
-  headerTitle: { fontSize: 22, fontWeight: "800", color: "#0D1117", letterSpacing: -0.5 },
-  headerSubtitle: { fontSize: 12, color: "#8B949E", marginTop: 2 },
-  unreadBadge: { backgroundColor: "#238636", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
-  unreadBadgeText: { color: "#fff", fontSize: 11, fontWeight: "700" },
+  headerTitle: { fontSize: 22, fontWeight: "200", color: "#E0E0E0", letterSpacing: 1 },
+  headerSubtitle: { fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2, fontWeight: "300" },
+  unreadBadge: { borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4 },
+  unreadBadgeText: { color: "#fff", fontSize: 11, fontWeight: "300" },
 
-  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", marginTop: 60, gap: 8 },
-  emptyTitle: { fontSize: 18, fontWeight: "700", color: "#0D1117" },
-  emptyDesc: { fontSize: 14, color: "#8B949E", textAlign: "center", paddingHorizontal: 24 },
+  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", marginTop: 60, gap: 10 },
+  emptyTitle: { fontSize: 18, fontWeight: "200", color: "#E0E0E0", letterSpacing: 0.5 },
+  emptyDesc: { fontSize: 14, color: "rgba(255,255,255,0.4)", textAlign: "center", paddingHorizontal: 24, fontWeight: "300" },
 
-  card: { backgroundColor: "#fff", borderRadius: 12, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: "#E2E8F0" },
-  unread: { borderColor: "#238636", backgroundColor: "#F0FFF4" },
-  cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
-  matchLabel: { flexDirection: "row", alignItems: "center", backgroundColor: "#F0FFF4", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: "#51CF66" },
-  matchLabelText: { color: "#238636", fontSize: 11, fontWeight: "700" },
-  scoreBadge: { backgroundColor: "#F6F8FA", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: "#E2E8F0" },
-  scoreText: { color: "#0D1117", fontSize: 11, fontWeight: "700" },
-  message: { fontSize: 14, color: "#0D1117", marginBottom: 10, lineHeight: 20 },
+  card: { backgroundColor: "rgba(255,255,255,0.02)", borderRadius: 16, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
+  unread: { borderColor: "rgba(255,65,108,0.2)", backgroundColor: "rgba(255,65,108,0.03)" },
+  cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 },
+  matchLabel: { flexDirection: "row", alignItems: "center", backgroundColor: "rgba(255,65,108,0.1)", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: "rgba(255,65,108,0.2)" },
+  matchLabelText: { color: "#FF416C", fontSize: 11, fontWeight: "300" },
+  scoreBadge: { backgroundColor: "rgba(255,255,255,0.03)", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" },
+  scoreText: { color: "rgba(255,255,255,0.6)", fontSize: 11, fontWeight: "300" },
+  message: { fontSize: 14, color: "#E0E0E0", marginBottom: 10, lineHeight: 20, fontWeight: "300" },
   cardFooter: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  time: { fontSize: 12, color: "#8B949E" },
+  time: { fontSize: 12, color: "rgba(255,255,255,0.3)", fontWeight: "300" },
   tapRow: { flexDirection: "row", alignItems: "center" },
-  tap: { fontSize: 12, color: "#238636", fontWeight: "700" },
+  tap: { fontSize: 12, color: "#FF416C", fontWeight: "300" },
 });
