@@ -36,9 +36,6 @@ export default function LoginScreen() {
 
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.logoBadge} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-            <Search size={26} color="#fff" strokeWidth={1.5} />
-          </LinearGradient>
           <Text style={styles.appName}>AIFoundIT</Text>
           <Text style={styles.appTagline}>Lost & Found, Powered by AI</Text>
         </View>
@@ -113,8 +110,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#070709" },
   scrollContent: { flexGrow: 1, justifyContent: "center", padding: 24 },
 
-  logoContainer: { alignItems: "center", marginBottom: 40 },
-  logoBadge: { width: 64, height: 64, borderRadius: 20, justifyContent: "center", alignItems: "center", marginBottom: 16 },
+  logoContainer: { alignItems: "center", marginBottom: 32 },
   appName: { fontSize: 26, fontWeight: "200", color: "#E0E0E0", letterSpacing: 2 },
   appTagline: { fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 6, fontWeight: "300", letterSpacing: 0.5 },
 

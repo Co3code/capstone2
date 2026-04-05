@@ -6,8 +6,7 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { useLocalSearchParams, router } from "expo-router";
-import { ArrowLeft, MapPin, ImageOff } from "lucide-react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { ArrowLeft, ImageOff } from "lucide-react-native";
 
 export default function PostDetailsScreen() {
   const { postId } = useLocalSearchParams();
@@ -108,7 +107,6 @@ const styles = StyleSheet.create({
 
   title: { fontSize: 22, fontWeight: "200", color: "#E0E0E0", marginBottom: 16, letterSpacing: 0.5 },
   row: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", paddingVertical: 10 },
-  locationRow: { flexDirection: "row", alignItems: "center", flex: 2, justifyContent: "flex-end", flexWrap: "wrap" },
   label: { fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: "300", flex: 1 },
   value: { fontSize: 13, color: "#E0E0E0", flex: 2, textAlign: "right", fontWeight: "300", flexWrap: "wrap" },
   link: { fontSize: 13, color: "#FF416C", fontWeight: "300" },

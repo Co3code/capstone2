@@ -60,9 +60,6 @@ export default function HomeScreen() {
           <Text style={styles.headerTitle}>AIFoundIT</Text>
           <Text style={styles.headerSubtitle}>Lost & Found, Powered by AI</Text>
         </View>
-        <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.headerIcon} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-          <Search size={18} color="#fff" strokeWidth={1.5} />
-        </LinearGradient>
       </View>
 
       {/* Search */}
