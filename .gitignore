@@ -69,3 +69,4 @@ wheels/
 .installed.cfg
 *.egg
 eas.json 
+SET.md 
