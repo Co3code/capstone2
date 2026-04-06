@@ -63,6 +63,7 @@ export default function ProfileScreen() {
   };
 
   const handleSavePhone = async () => {
+    if (editPhone.length !== 11) return Alert.alert("Error", "Phone number must be 11 digits");
     await updateDoc(doc(db, "users", user?.uid!), { phone: editPhone });
     setPhone(editPhone);
     setModalVisible(false);
@@ -173,6 +174,7 @@ export default function ProfileScreen() {
               value={editPhone}
               onChangeText={setEditPhone}
               keyboardType="phone-pad"
+              maxLength={11}
             />
             <TouchableOpacity onPress={handleSavePhone} activeOpacity={0.85}>
               <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.button} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>

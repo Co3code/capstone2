@@ -23,6 +23,7 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!name || !email || !phone || !password || !confirm) return Alert.alert("Error", "Please fill in all fields");
+    if (phone.length !== 11) return Alert.alert("Error", "Phone number must be 11 digits");
     if (password !== confirm) return Alert.alert("Error", "Passwords do not match");
     setLoading(true);
     try {
@@ -97,6 +98,7 @@ export default function RegisterScreen() {
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"
+              maxLength={11}
               onFocus={() => setFocused("phone")}
               onBlur={() => setFocused(null)}
             />
