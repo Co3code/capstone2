@@ -8,7 +8,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/services/firebase";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { Eye, EyeOff, Search } from "lucide-react-native";
+import { Eye, EyeOff } from "lucide-react-native";
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");
