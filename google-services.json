@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "335758254477",
+    "project_id": "aifoundit-app",
+    "storage_bucket": "aifoundit-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335758254477:android:f7c56a456c964656bc9dc4",
+        "android_client_info": {
+          "package_name": "com.aifoundit.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeSskr9u8gxY53XLQuaxzQbQ3DZmGftbA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

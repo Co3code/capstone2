@@ -21,6 +21,7 @@
       },
       "edgeToEdgeEnabled": false,
       "navigationBarColor": "#070709",
+      "googleServicesFile": "./google-services.json"
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -29,6 +30,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-notifications",
       [
         "expo-splash-screen",
         {

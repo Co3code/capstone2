@@ -12,6 +12,19 @@ import { matchItems } from "@/services/api";
 import { LinearGradient } from "expo-linear-gradient";
 import { Camera, Image as ImageIcon, X } from "lucide-react-native";
 
+const sendPushNotification = async (pushToken: string, message: string) => {
+  await fetch("https://exp.host/--/api/v2/push/send", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      to: pushToken,
+      title: "AIFoundIt - Match Found!",
+      body: message,
+      sound: "default",
+    }),
+  });
+};
+
 export default function PostScreen() {
   const [type, setType] = useState<"lost" | "found">("lost");
   const [title, setTitle] = useState("");
@@ -75,21 +88,40 @@ export default function PostScreen() {
           const matches = await matchItems(docRef.id, title, description, imageUrl, existingPosts);
           const topMatch = matches.find((m: any) => m.is_match);
           if (topMatch) {
+            const currentUserMsg = `We found a possible match for your ${type} item "${title}"!`;
+            const otherUserMsg = `We found a possible match for your ${oppositeType} item "${existingPosts.find((p: any) => p.id === topMatch.post_id)?.title}"!`;
+
+            // Notify current user
             await addDoc(collection(db, "notifications"), {
               userId: auth.currentUser?.uid,
-              message: `We found a possible match for your ${type} item "${title}"!`,
+              message: currentUserMsg,
               matchedPostId: topMatch.post_id, myPostId: docRef.id,
               score: topMatch.score, createdAt: new Date().toISOString(), read: false,
             });
+
+            // Notify the other user
             const matchedPost = existingPosts.find((p: any) => p.id === topMatch.post_id);
             if (matchedPost) {
               await addDoc(collection(db, "notifications"), {
                 userId: matchedPost.userId,
-                message: `We found a possible match for your ${oppositeType} item "${matchedPost.title}"!`,
+                message: otherUserMsg,
                 matchedPostId: docRef.id, myPostId: topMatch.post_id,
                 score: topMatch.score, createdAt: new Date().toISOString(), read: false,
               });
+
+              // Send push notifications
+              const { getDoc, doc: firestoreDoc } = await import("firebase/firestore");
+              const currentUserDoc = await getDoc(firestoreDoc(db, "users", auth.currentUser?.uid!));
+              const otherUserDoc = await getDoc(firestoreDoc(db, "users", matchedPost.userId));
+
+              if (currentUserDoc.data()?.pushToken) {
+                await sendPushNotification(currentUserDoc.data()?.pushToken, currentUserMsg);
+              }
+              if (otherUserDoc.data()?.pushToken) {
+                await sendPushNotification(otherUserDoc.data()?.pushToken, otherUserMsg);
+              }
             }
+
             await updateDoc(doc(db, "posts", docRef.id), { status: "matched" });
             await updateDoc(doc(db, "posts", topMatch.post_id), { status: "matched" });
           }
