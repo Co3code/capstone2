@@ -19,7 +19,7 @@ export default function ForgotPasswordScreen() {
     setLoading(true);
     try {
       await sendPasswordResetEmail(auth, email);
-      Alert.alert("Success", "Password reset email sent! Check your inbox.", [
+      Alert.alert("Success", "Password reset email sent! Check your inbox or spam.", [
         { text: "OK", onPress: () => router.back() },
       ]);
     } catch {
