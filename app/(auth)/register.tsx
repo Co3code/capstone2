@@ -1,14 +1,22 @@
-import { useState } from "react";
-import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
-  Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView,
-} from "react-native";
+import { auth, db } from "@/services/firebase";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "@/services/firebase";
-import { router } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import { Eye, EyeOff } from "lucide-react-native";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");
@@ -20,24 +28,56 @@ export default function RegisterScreen() {
   const [focused, setFocused] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleRegister = async () => {
-    if (!name || !email || !phone || !password || !confirm) return Alert.alert("Error", "Please fill in all fields");
-    if (phone.length !== 11) return Alert.alert("Error", "Phone number must be 11 digits");
-    if (password !== confirm) return Alert.alert("Error", "Passwords do not match");
+    setErrorMsg(null);
+
+    if (!name || !email || !phone || !password || !confirm) {
+      setErrorMsg("Please fill in all fields");
+      return;
+    }
+
+    if (phone.length !== 11) {
+      setErrorMsg("Phone number must be 11 digits");
+      return;
+    }
+
+    if (password !== confirm) {
+      setErrorMsg("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
+
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
+
       await updateProfile(user, { displayName: name });
+
       await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid, name, email, phone,
+        uid: user.uid,
+        name,
+        email,
+        phone,
         createdAt: new Date().toISOString(),
       });
+
       Alert.alert("Success", "Account created! Please login.", [
         { text: "OK", onPress: () => router.replace("/(auth)/login") },
       ]);
-    } catch {
-      Alert.alert("Registration Failed", "Something went wrong. Please try again.");
+    } catch (error: any) {
+      console.log("REGISTER ERROR:", error);
+
+      if (error.code === "auth/email-already-in-use") {
+        setErrorMsg("This email is already registered.");
+      } else if (error.code === "auth/invalid-email") {
+        setErrorMsg("Invalid email format.");
+      } else if (error.code === "auth/weak-password") {
+        setErrorMsg("Password should be at least 6 characters.");
+      } else {
+        setErrorMsg("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -46,7 +86,6 @@ export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-
         {/* Logo */}
         <View style={styles.logoContainer}>
           <Text style={styles.appName}>AIFoundIT</Text>
@@ -66,7 +105,10 @@ export default function RegisterScreen() {
               placeholder="e.g. Maria Santos"
               placeholderTextColor="rgba(255,255,255,0.2)"
               value={name}
-              onChangeText={setName}
+              onChangeText={(text) => {
+                setName(text);
+                setErrorMsg(null);
+              }}
               onFocus={() => setFocused("name")}
               onBlur={() => setFocused(null)}
             />
@@ -80,7 +122,10 @@ export default function RegisterScreen() {
               placeholder="name@example.com"
               placeholderTextColor="rgba(255,255,255,0.2)"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => {
+                setEmail(text);
+                setErrorMsg(null);
+              }}
               keyboardType="email-address"
               autoCapitalize="none"
               onFocus={() => setFocused("email")}
@@ -96,7 +141,10 @@ export default function RegisterScreen() {
               placeholder="+63 912 345 6789"
               placeholderTextColor="rgba(255,255,255,0.2)"
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={(text) => {
+                setPhone(text);
+                setErrorMsg(null);
+              }}
               keyboardType="phone-pad"
               maxLength={11}
               onFocus={() => setFocused("phone")}
@@ -113,16 +161,20 @@ export default function RegisterScreen() {
                 placeholder="••••••••"
                 placeholderTextColor="rgba(255,255,255,0.2)"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  setErrorMsg(null);
+                }}
                 secureTextEntry={!showPassword}
                 onFocus={() => setFocused("password")}
                 onBlur={() => setFocused(null)}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                {showPassword
-                  ? <EyeOff size={18} color="rgba(255,255,255,0.4)" strokeWidth={1.5} />
-                  : <Eye size={18} color="rgba(255,255,255,0.4)" strokeWidth={1.5} />
-                }
+                {showPassword ? (
+                  <EyeOff size={18} color="rgba(255,255,255,0.4)" strokeWidth={1.5} />
+                ) : (
+                  <Eye size={18} color="rgba(255,255,255,0.4)" strokeWidth={1.5} />
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -136,22 +188,37 @@ export default function RegisterScreen() {
                 placeholder="••••••••"
                 placeholderTextColor="rgba(255,255,255,0.2)"
                 value={confirm}
-                onChangeText={setConfirm}
+                onChangeText={(text) => {
+                  setConfirm(text);
+                  setErrorMsg(null);
+                }}
                 secureTextEntry={!showConfirm}
                 onFocus={() => setFocused("confirm")}
                 onBlur={() => setFocused(null)}
               />
               <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
-                {showConfirm
-                  ? <EyeOff size={18} color="rgba(255,255,255,0.4)" strokeWidth={1.5} />
-                  : <Eye size={18} color="rgba(255,255,255,0.4)" strokeWidth={1.5} />
-                }
+                {showConfirm ? (
+                  <EyeOff size={18} color="rgba(255,255,255,0.4)" strokeWidth={1.5} />
+                ) : (
+                  <Eye size={18} color="rgba(255,255,255,0.4)" strokeWidth={1.5} />
+                )}
               </TouchableOpacity>
             </View>
           </View>
+          {errorMsg && <Text style={{ color: "#FF4B2B", marginBottom: 10, textAlign: "center" }}>{errorMsg}</Text>}
 
-          <TouchableOpacity onPress={handleRegister} disabled={loading} activeOpacity={0.85}>
-            <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.button} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+          <TouchableOpacity
+            onPress={handleRegister}
+            disabled={loading}
+            activeOpacity={0.85}
+            style={{ opacity: loading ? 0.6 : 1 }}
+          >
+            <LinearGradient
+              colors={["#FF416C", "#FF4B2B"]}
+              style={styles.button}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
               {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Create account</Text>}
             </LinearGradient>
           </TouchableOpacity>
@@ -163,7 +230,6 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           </View>
         </View>
-
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -178,8 +244,11 @@ const styles = StyleSheet.create({
   appTagline: { fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 6, fontWeight: "300", letterSpacing: 0.5 },
 
   card: {
-    backgroundColor: "rgba(255,255,255,0.02)", borderRadius: 24,
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.05)", padding: 28,
+    backgroundColor: "rgba(255,255,255,0.02)",
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)",
+    padding: 28,
   },
   cardTitle: { fontSize: 28, fontWeight: "200", color: "#E0E0E0", marginBottom: 6, letterSpacing: 0.5 },
   cardSubtitle: { fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 32, fontWeight: "300" },
@@ -188,16 +257,25 @@ const styles = StyleSheet.create({
   label: { fontSize: 13, fontWeight: "300", color: "rgba(255,255,255,0.6)", marginBottom: 10, letterSpacing: 0.5 },
 
   input: {
-    backgroundColor: "rgba(255,255,255,0.03)", borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.05)", borderRadius: 12,
-    paddingHorizontal: 16, paddingVertical: 14,
-    fontSize: 15, color: "#E0E0E0", fontWeight: "300",
+    backgroundColor: "rgba(255,255,255,0.03)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: "#E0E0E0",
+    fontWeight: "300",
   },
   inputRow: {
-    flexDirection: "row", alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.03)", borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.05)", borderRadius: 12,
-    paddingHorizontal: 16, paddingVertical: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.03)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   inputInner: { flex: 1, fontSize: 15, color: "#E0E0E0", fontWeight: "300" },
   inputFocused: { borderColor: "#FF416C" },
