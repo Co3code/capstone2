@@ -7,12 +7,12 @@ import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { Search, ArrowLeft } from "lucide-react-native";
+import { ArrowLeft } from "lucide-react-native";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [emailFocused, setEmailFocused] = useState(false);
+  const [focused, setFocused] = useState<string | null>(null);
 
   const handleReset = async () => {
     if (!email) return Alert.alert("Error", "Please enter your email");
@@ -33,32 +33,32 @@ export default function ForgotPasswordScreen() {
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-        {/* Logo */}
+        {/* Logo Section - Search badge removed */}
         <View style={styles.logoContainer}>
-          <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.logoBadge} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-            <Search size={26} color="#fff" strokeWidth={1.5} />
-          </LinearGradient>
           <Text style={styles.appName}>AIFoundIT</Text>
           <Text style={styles.appTagline}>Lost & Found, Powered by AI</Text>
         </View>
 
-        {/* Card */}
-        <View style={styles.card}>
+        {/* Header Section */}
+        <View style={styles.headerTextContainer}>
           <Text style={styles.cardTitle}>Reset password</Text>
           <Text style={styles.cardSubtitle}>Enter the email address you used to register</Text>
+        </View>
 
+        {/* Form Section */}
+        <View style={styles.formContainer}>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email address</Text>
             <TextInput
-              style={[styles.input, emailFocused && styles.inputFocused]}
+              style={[styles.underlineInput, focused === "email" && styles.inputFocused]}
               placeholder="name@example.com"
               placeholderTextColor="rgba(255,255,255,0.2)"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              onFocus={() => setEmailFocused(true)}
-              onBlur={() => setEmailFocused(false)}
+              onFocus={() => setFocused("email")}
+              onBlur={() => setFocused(null)}
             />
           </View>
 
@@ -81,32 +81,34 @@ export default function ForgotPasswordScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#070709" },
-  scrollContent: { flexGrow: 1, justifyContent: "center", padding: 24 },
+  scrollContent: { flexGrow: 1, padding: 24, paddingVertical: 48 },
 
   logoContainer: { alignItems: "center", marginBottom: 40 },
-  logoBadge: { width: 64, height: 64, borderRadius: 20, justifyContent: "center", alignItems: "center", marginBottom: 16 },
   appName: { fontSize: 26, fontWeight: "200", color: "#E0E0E0", letterSpacing: 2 },
   appTagline: { fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 6, fontWeight: "300", letterSpacing: 0.5 },
 
-  card: {
-    backgroundColor: "rgba(255,255,255,0.02)", borderRadius: 24,
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.05)", padding: 28,
+  headerTextContainer: { 
+    marginBottom: 32,
+    marginTop: 70, 
   },
   cardTitle: { fontSize: 28, fontWeight: "200", color: "#E0E0E0", marginBottom: 6, letterSpacing: 0.5 },
-  cardSubtitle: { fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 32, fontWeight: "300" },
+  cardSubtitle: { fontSize: 14, color: "rgba(255,255,255,0.4)", fontWeight: "300" },
 
+  formContainer: { width: "100%" },
   inputGroup: { marginBottom: 20 },
   label: { fontSize: 13, fontWeight: "300", color: "rgba(255,255,255,0.6)", marginBottom: 10, letterSpacing: 0.5 },
 
-  input: {
-    backgroundColor: "rgba(255,255,255,0.03)", borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.05)", borderRadius: 12,
-    paddingHorizontal: 16, paddingVertical: 14,
-    fontSize: 15, color: "#E0E0E0", fontWeight: "300",
+  underlineInput: {
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.05)",
+    paddingVertical: 12,
+    fontSize: 15,
+    color: "#E0E0E0",
+    fontWeight: "300",
   },
-  inputFocused: { borderColor: "#FF416C" },
+  inputFocused: { borderBottomColor: "#FF416C" },
 
-  button: { borderRadius: 999, paddingVertical: 16, alignItems: "center", marginTop: 8 },
+  button: { borderRadius: 999, paddingVertical: 16, alignItems: "center", marginTop: 15 },
   buttonText: { color: "#fff", fontSize: 15, fontWeight: "300", letterSpacing: 1 },
 
   footer: { flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 24 },
