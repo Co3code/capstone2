@@ -63,7 +63,7 @@ export default function ProfileScreen() {
   };
 
   const handleSavePhone = async () => {
-    if (editPhone.length !== 11) return Alert.alert("Error", "Phone number must be 11 digits");
+    if (editPhone && editPhone.length !== 11) return Alert.alert("Error", "Phone number must be 11 digits");
     await updateDoc(doc(db, "users", user?.uid!), { phone: editPhone });
     setPhone(editPhone);
     setModalVisible(false);

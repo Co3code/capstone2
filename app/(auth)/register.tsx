@@ -53,8 +53,7 @@ export default function RegisterScreen() {
     if (!email) return setFieldError("email", "Email is required");
     const emailRegex = /\S+@\S+\.\S+/;
     if (!emailRegex.test(email)) return setFieldError("email", "Invalid email format");
-    if (!phone) return setFieldError("phone", "Phone is required");
-    if (phone.length !== 11) return setFieldError("phone", "Must be 11 digits");
+    if (phone && phone.length !== 11) return setFieldError("phone", "Must be 11 digits");
     if (!password) return setFieldError("password", "Password is required");
     if (password !== confirm) return setFieldError("confirm", "Passwords do not match");
 
@@ -83,13 +82,13 @@ export default function RegisterScreen() {
     }
   };
 
-
-
-
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Original Logo and Tagline Style */}
         <View style={styles.logoContainer}>
           <Text style={styles.appName}>AIFoundIT</Text>
@@ -104,14 +103,16 @@ export default function RegisterScreen() {
 
         {/* Form Fields */}
         <View style={styles.formContainer}>
-          
           {/* NAME */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Full name</Text>
+            <Text style={styles.label}>Name</Text>
             <TextInput
               style={[styles.underlineInput, focused === "name" && styles.inputFocused]}
               value={name}
-              onChangeText={(text) => { setName(text); setErrors((p) => ({ ...p, name: "" })); }}
+              onChangeText={(text) => {
+                setName(text);
+                setErrors((p) => ({ ...p, name: "" }));
+              }}
               onFocus={() => setFocused("name")}
               onBlur={() => setFocused(null)}
             />
@@ -126,11 +127,14 @@ export default function RegisterScreen() {
               value={email}
               keyboardType="email-address"
               autoCapitalize="none"
-              onChangeText={(text) => { setEmail(text); setErrors((p) => ({ ...p, email: "" })); }}
+              onChangeText={(text) => {
+                setEmail(text);
+                setErrors((p) => ({ ...p, email: "" }));
+              }}
               onFocus={() => setFocused("email")}
               onBlur={() => setFocused(null)}
             />
-            
+
             {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
           </View>
 
@@ -144,7 +148,10 @@ export default function RegisterScreen() {
               maxLength={11}
               onFocus={() => setFocused("phone")}
               onBlur={() => setFocused(null)}
-              onChangeText={(text) => { setPhone(text); setErrors((p) => ({ ...p, phone: "" })); }}
+              onChangeText={(text) => {
+                setPhone(text);
+                setErrors((p) => ({ ...p, phone: "" }));
+              }}
             />
             {errors.phone ? <Text style={styles.errorText}>{errors.phone}</Text> : null}
           </View>
@@ -153,7 +160,13 @@ export default function RegisterScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Password</Text>
             {strength !== "" && (
-              <Text style={{ fontSize: 12, color: strength === "weak" ? "red" : strength === "medium" ? "orange" : "green", marginBottom: 5 }}>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: strength === "weak" ? "red" : strength === "medium" ? "orange" : "green",
+                  marginBottom: 5,
+                }}
+              >
                 {strength === "weak" ? "Weak " : strength === "medium" ? "Medium " : "Strong "}
               </Text>
             )}
@@ -176,7 +189,11 @@ export default function RegisterScreen() {
                 onBlur={() => setFocused(null)}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                {showPassword ? <EyeOff size={18} color="rgba(255,255,255,0.4)" /> : <Eye size={18} color="rgba(255,255,255,0.4)" />}
+                {showPassword ? (
+                  <EyeOff size={18} color="rgba(255,255,255,0.4)" />
+                ) : (
+                  <Eye size={18} color="rgba(255,255,255,0.4)" />
+                )}
               </TouchableOpacity>
             </View>
             {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
@@ -192,19 +209,31 @@ export default function RegisterScreen() {
                 placeholder="••••••••"
                 placeholderTextColor="rgba(255,255,255,0.2)"
                 secureTextEntry={!showConfirm}
-                onChangeText={(text) => { setConfirm(text); setErrors((p) => ({ ...p, confirm: "" })); }}
+                onChangeText={(text) => {
+                  setConfirm(text);
+                  setErrors((p) => ({ ...p, confirm: "" }));
+                }}
                 onFocus={() => setFocused("confirm")}
                 onBlur={() => setFocused(null)}
               />
               <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
-                {showConfirm ? <EyeOff size={18} color="rgba(255,255,255,0.4)" /> : <Eye size={18} color="rgba(255,255,255,0.4)" />}
+                {showConfirm ? (
+                  <EyeOff size={18} color="rgba(255,255,255,0.4)" />
+                ) : (
+                  <Eye size={18} color="rgba(255,255,255,0.4)" />
+                )}
               </TouchableOpacity>
             </View>
             {errors.confirm ? <Text style={styles.errorText}>{errors.confirm}</Text> : null}
           </View>
 
           <TouchableOpacity onPress={handleRegister} disabled={loading} activeOpacity={0.85}>
-            <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.button} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <LinearGradient
+              colors={["#FF416C", "#FF4B2B"]}
+              style={styles.button}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
               {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Create account</Text>}
             </LinearGradient>
           </TouchableOpacity>
