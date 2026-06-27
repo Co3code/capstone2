@@ -70,4 +70,7 @@ wheels/
 *.egg
 eas.json 
 SET.md 
+set2.md
 google-services.json 
+
+assets/images
