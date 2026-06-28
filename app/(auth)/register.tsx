@@ -140,7 +140,7 @@ export default function RegisterScreen() {
 
           {/* PHONE */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Phone number</Text>
+            <Text style={styles.label}>Phone number (Optional)</Text>
             <TextInput
               style={[styles.underlineInput, focused === "phone" && styles.inputFocused]}
               value={phone}
